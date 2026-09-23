@@ -1,0 +1,12 @@
+[project]
+name = "aliyun-ai-agent-handbook"
+version = "0.1.0"
+description = "阿里云 AI Agent Handbook 文档站（MkDocs + MaterialX）"
+requires-python = ">=3.9"
+dependencies = [
+    "mkdocs",
+    "mkdocs-materialx",
+]
+
+[tool.uv]
+package = false

@@ -1,10 +1,13 @@
-#!/usr/bin/env bash
 # 把仓库根目录的 Markdown 与 assets 镜像到 docs/ 供 MkDocs 构建。
+# 依赖由 uv 管理（见 pyproject.toml / uv.lock），首次运行会自动创建 .venv 并安装。
 # 用法:
 #   ./build.sh          # 构建到 site/
 #   ./build.sh serve    # 本地预览 (http://127.0.0.1:8000)
 set -euo pipefail
 cd "$(dirname "$0")"
+
+# 用 uv 解析并安装依赖（幂等，已同步则跳过）
+uv sync --quiet
 
 # 目标镜像目录
 rm -rf docs
@@ -20,7 +23,7 @@ for item in 00-preface 01-architecture 02-build 03-run 04-governance \
 done
 
 if [ "${1:-build}" = "serve" ]; then
-  exec python3 -m mkdocs serve
+  exec uv run mkdocs serve
 else
-  exec python3 -m mkdocs build --strict
+  exec uv run mkdocs build --strict
 fi

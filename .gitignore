@@ -5,6 +5,10 @@
 .cursor
 .codex
 *.impl
+__pycache__/
+*.pyc
 # MkDocs 生成物（docs/ 为构建镜像，site/ 为输出）
 docs/
 site/
+# uv 虚拟环境
+.venv/
