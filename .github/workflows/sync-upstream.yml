@@ -1,0 +1,37 @@
+name: Sync Upstream
+
+# 定期把上游 aliyun/ai-agent-handbook 的 main 合并进本站点分支 docs-site。
+# 合并后 push 到 docs-site 会触发 docs.yml 重新构建发布。
+on:
+  schedule:
+    # 每天 01:07 (避开整点)
+    - cron: "7 1 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout docs-site
+        uses: actions/checkout@v4
+        with:
+          ref: docs-site
+          fetch-depth: 0
+
+      - name: Merge upstream main
+        run: |
+          git remote add upstream https://github.com/aliyun/ai-agent-handbook.git
+          git fetch upstream main
+          git merge --no-edit upstream/main || {
+            echo "::error::上游合并冲突，请手动解决 docs-site 分支冲突"
+            exit 1
+          }
+
+      - name: Push changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git push origin docs-site

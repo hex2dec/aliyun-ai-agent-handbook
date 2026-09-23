@@ -5,3 +5,6 @@
 .cursor
 .codex
 *.impl
+# MkDocs 生成物（docs/ 为构建镜像，site/ 为输出）
+docs/
+site/

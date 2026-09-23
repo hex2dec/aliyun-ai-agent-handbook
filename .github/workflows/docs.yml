@@ -1,0 +1,42 @@
+name: Build and Deploy GitHub Pages
+
+on:
+  push:
+    branches: [docs-site]
+
+permissions:
+  contents: write
+
+jobs:
+  build-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install MkDocs Material
+        run: |
+          pip install mkdocs-material
+
+      - name: Prepare docs mirror
+        run: |
+          rm -rf docs && mkdir -p docs
+          for item in 00-preface 01-architecture 02-build 03-run 04-governance \
+                      05-optimization 06-case-study 07-conclusion assets \
+                      README.md README_EN.md 2026-agent-survey-report.md; do
+            if [ -e "$item" ]; then cp -R "$item" docs/; fi
+          done
+
+      - name: Build site
+        run: mkdocs build --strict
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./site
