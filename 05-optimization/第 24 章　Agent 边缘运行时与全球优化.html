@@ -1,0 +1,4078 @@
+
+<!doctype html>
+<html lang="zh" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="阿里云 AI Agent 手白皮书 — 架构 · 构建 · 运行 · 治理 · 调优 · 实践">
+      
+      
+      
+      
+        <link rel="prev" href="%E7%AC%AC%2023%20%E7%AB%A0%E3%80%80%E5%8F%97%E6%8E%A7%E8%87%AA%E8%BF%9B%E5%8C%96.html">
+      
+      
+        <link rel="next" href="../06-case-study/index.html">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+    
+    
+      
+        <title>第 24 章 Agent 边缘运行时与全球优化 - AI Agent 手白皮书</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.ec1eaa64.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#24-agent" class="md-skip">
+          跳转至
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="页眉">
+    <a href="../index.html" title="AI Agent 手白皮书" class="md-header__button md-logo" aria-label="AI Agent 手白皮书" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            AI Agent 手白皮书
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              第 24 章　Agent 边缘运行时与全球优化
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="切换到深色模式"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="切换到深色模式" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m17.75 4.09-2.53 1.94.91 3.06-2.63-1.81-2.63 1.81.91-3.06-2.53-1.94L12.44 4l1.06-3 1.06 3zm3.5 6.91-1.64 1.25.59 1.98-1.7-1.17-1.7 1.17.59-1.98L15.75 11l2.06-.05L18.5 9l.69 1.95zm-2.28 4.95c.83-.08 1.72 1.1 1.19 1.85-.32.45-.66.87-1.08 1.27C15.17 23 8.84 23 4.94 19.07c-3.91-3.9-3.91-10.24 0-14.14.4-.4.82-.76 1.27-1.08.75-.53 1.93.36 1.85 1.19-.27 2.86.69 5.83 2.89 8.02a9.96 9.96 0 0 0 8.02 2.89m-1.64 2.02a12.08 12.08 0 0 1-7.8-3.47c-2.17-2.19-3.33-5-3.49-7.82-2.81 3.14-2.7 7.96.31 10.98 3.02 3.01 7.84 3.12 10.98.31"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="切换到浅色模式"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="切换到浅色模式" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3m0-7 2.39 3.42C13.65 5.15 12.84 5 12 5s-1.65.15-2.39.42zM3.34 7l4.16-.35A7.2 7.2 0 0 0 5.94 8.5c-.44.74-.69 1.5-.83 2.29zm.02 10 1.76-3.77a7.131 7.131 0 0 0 2.38 4.14zM20.65 7l-1.77 3.79a7.02 7.02 0 0 0-2.38-4.15zm-.01 10-4.14.36c.59-.51 1.12-1.14 1.54-1.86.42-.73.69-1.5.83-2.29zM12 22l-2.41-3.44c.74.27 1.55.44 2.41.44.82 0 1.63-.17 2.37-.44z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="搜索" placeholder="搜索" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="查找">
+        
+        <button type="reset" class="md-search__icon md-icon" title="清空当前内容" aria-label="清空当前内容" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            正在初始化搜索引擎
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="标签" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../index.html" class="md-tabs__link">
+        
+  
+  
+    
+  
+  首页
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../2026-agent-survey-report.html" class="md-tabs__link">
+        
+  
+  
+    
+  
+  调研报告
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../00-preface/00-preface.html" class="md-tabs__link">
+        
+  
+  
+    
+  
+  前言
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../01-architecture/index.html" class="md-tabs__link">
+          
+  
+  
+  架构篇
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../02-build/index.html" class="md-tabs__link">
+          
+  
+  
+  构建篇
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../03-run/index.html" class="md-tabs__link">
+          
+  
+  
+  运行篇
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../04-governance/%E6%B2%BB%E7%90%86%E7%AF%87%E5%AF%BC%E8%AF%BB.html" class="md-tabs__link">
+          
+  
+  
+  治理篇
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="%E8%B0%83%E4%BC%98%E7%AF%87%E5%AF%BC%E8%AF%BB.html" class="md-tabs__link">
+          
+  
+  
+  调优篇
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../06-case-study/index.html" class="md-tabs__link">
+          
+  
+  
+  实践篇
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../07-conclusion/%E7%AC%AC%2030%20%E7%AB%A0%20%E4%BB%8E%20Agentic%20Application%20%E5%88%B0%20Agentic%20OS.html" class="md-tabs__link">
+          
+  
+  
+  总结与展望篇
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="导航栏" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../index.html" title="AI Agent 手白皮书" class="md-nav__button md-logo" aria-label="AI Agent 手白皮书" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    AI Agent 手白皮书
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    首页
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../2026-agent-survey-report.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    调研报告
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../00-preface/00-preface.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    前言
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    架构篇
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    架构篇
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../01-architecture/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    架构篇导读
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../01-architecture/%E7%AC%AC%201%20%E7%AB%A0%E3%80%80AI%20%E5%8E%9F%E7%94%9F%E5%BA%94%E7%94%A8%E7%9A%84%E6%96%B0%E9%98%B6%E6%AE%B5.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第 1 章　AI 原生应用的新阶段
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../01-architecture/%E7%AC%AC%202%20%E7%AB%A0%E3%80%80Agentic%20Application%20%E5%8F%82%E8%80%83%E6%9E%B6%E6%9E%84.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第 2 章　Agentic Application 参考架构
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    构建篇
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    构建篇
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../02-build/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    构建篇导读
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../02-build/%E7%AC%AC%203%20%E7%AB%A0%20%E8%8C%83%E5%BC%8F%EF%BC%9AHarness%20%E7%9A%84%E4%B8%BB%E6%B5%81%E6%9E%84%E5%BB%BA%E6%96%B9%E5%BC%8F%E5%92%8C%E8%B4%A3%E4%BB%BB%E8%BE%B9%E7%95%8C.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第 3 章　范式：Harness 的主流构建方式和责任边界
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../02-build/%E7%AC%AC%204%20%E7%AB%A0%20%E4%BB%BB%E5%8A%A1%EF%BC%9A%E7%BC%96%E6%8E%92%E3%80%81%E9%95%BF%E7%A8%8B%E6%8E%A8%E8%BF%9B%E4%B8%8E%E5%8D%8F%E4%BD%9C%E6%B5%81%E8%BD%AC.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第 4 章　任务：编排、长程推进与协作流转
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../02-build/%E7%AC%AC%205%20%E7%AB%A0%20%E4%BF%A1%E6%81%AF%EF%BC%9A%E4%B8%8A%E4%B8%8B%E6%96%87%E3%80%81%E7%8A%B6%E6%80%81%E4%B8%8E%E5%8F%AF%E5%A4%8D%E7%94%A8%E8%83%BD%E5%8A%9B%E8%B5%84%E4%BA%A7.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第 5 章　信息：上下文、状态与可复用能力资产
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../02-build/%E7%AC%AC%206%20%E7%AB%A0%20%E8%A1%8C%E5%8A%A8%EF%BC%9A%E5%8F%97%E6%8E%A7%E6%89%A7%E8%A1%8C%E3%80%81%E9%AA%8C%E8%AF%81%E5%8F%8D%E9%A6%88%E4%B8%8E%E4%BA%A4%E4%BB%98%E5%87%86%E5%A4%87.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第 6 章　行动：受控执行、验证反馈与交付准备
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    运行篇
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    运行篇
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../03-run/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    运行篇导读
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../03-run/%E7%AC%AC%207%20%E7%AB%A0%20%20Agent%20%E8%BF%90%E8%A1%8C%E6%97%B6%E4%B8%8E%E6%B2%99%E7%AE%B1.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第 7 章　Agent 运行时与沙箱
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../03-run/%E7%AC%AC%208%20%E7%AB%A0%20Agent%20%E7%8A%B6%E6%80%81%E5%AD%98%E5%82%A8%E4%B8%8E%E8%AF%AD%E4%B9%89%E8%B5%84%E4%BA%A7.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第 8 章　Agent 状态存储与语义资产
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../03-run/%E7%AC%AC%209%20%E7%AB%A0%20%20AI%20%E7%BD%91%E5%85%B3%E4%B8%8E%E7%BB%9F%E4%B8%80%E6%B5%81%E9%87%8F%E6%B2%BB%E7%90%86.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第 9 章　AI 网关与统一流量治理
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../03-run/%E7%AC%AC%2010%20%E7%AB%A0%20%20Agent%20%E5%BC%82%E6%AD%A5%E4%BB%BB%E5%8A%A1%E4%B8%8E%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%81%E7%A8%8B.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第 10 章　Agent 异步任务与自动化流程
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../03-run/%E7%AC%AC%2011%E7%AB%A0%20%20Multi-Agent%20%E5%8D%8F%E4%BD%9C%E4%B8%8E%E7%BC%96%E6%8E%92.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第 11 章　Multi-Agent 协作与编排
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../03-run/%E7%AC%AC%2012%20%E7%AB%A0%20Agent%20%E5%88%86%E5%B8%83%E5%BC%8F%E9%80%9A%E4%BF%A1.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第 12 章　Agent 分布式通信
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7" >
+        
+          
+          <label class="md-nav__link" for="__nav_7" id="__nav_7_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    治理篇
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    治理篇
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../04-governance/%E6%B2%BB%E7%90%86%E7%AF%87%E5%AF%BC%E8%AF%BB.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    治理篇导读
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../04-governance/%E7%AC%AC%2013%20%E7%AB%A0%E3%80%80Agent%20%E7%9A%84%E5%8F%AF%E8%A7%82%E6%B5%8B%E6%80%A7.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第 13 章　Agent 的可观测性
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../04-governance/%E7%AC%AC%2014%20%E7%AB%A0%E3%80%80Agent%20%E5%AE%89%E5%85%A8.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第 14 章　Agent 安全
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../04-governance/%E7%AC%AC%2015%20%E7%AB%A0%E3%80%80AI%20%E8%B5%84%E4%BA%A7%E7%9A%84%E5%8F%91%E7%8E%B0%E4%B8%8E%E7%AE%A1%E7%90%86%20.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第 15 章　AI 资产的发现与管理
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../04-governance/%E7%AC%AC%2016%20%E7%AB%A0%E3%80%80Agent%20%E8%A1%8C%E4%B8%BA%E7%94%9F%E6%88%90%E4%B8%8E%E8%B4%A8%E9%87%8F%E9%AA%8C%E8%AF%81.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第 16 章　Agent 行为生成与质量验证
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_8" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_8" id="__nav_8_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    调优篇
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_8_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_8">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    调优篇
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="%E8%B0%83%E4%BC%98%E7%AF%87%E5%AF%BC%E8%AF%BB.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    调优篇导读
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="%E7%AC%AC%2017%20%E7%AB%A0%E3%80%80%E6%A8%A1%E5%9E%8B%E8%B0%83%E4%BC%98.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第 17 章　模型调优
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="%E7%AC%AC%2018%20%E7%AB%A0%E3%80%80Agent%20%E8%B0%83%E4%BC%98%E6%80%BB%E8%A7%88.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第 18 章　Agent 调优总览
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="%E7%AC%AC%2019%20%E7%AB%A0%E3%80%80Agent%20%E8%BD%A8%E8%BF%B9%E6%95%B0%E6%8D%AE.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第 19 章　Agent 轨迹数据
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="%E7%AC%AC%2020%20%E7%AB%A0%E3%80%80Agent%20%E8%BF%90%E8%A1%8C%E6%97%B6%E6%95%B0%E6%8D%AE%E5%A4%84%E7%90%86.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第 20 章　Agent 运行时数据处理
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="%E7%AC%AC%2021%20%E7%AB%A0%E3%80%80Agent%20%E9%BB%84%E9%87%91%E6%95%B0%E6%8D%AE%E9%9B%86.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第 21 章　Agent 黄金数据集
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="%E7%AC%AC%2022%20%E7%AB%A0%E3%80%80Agent%20%E4%BC%98%E5%8C%96%EF%BC%9ABadcase%20.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第 22 章　Agent 优化：Badcase
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="%E7%AC%AC%2023%20%E7%AB%A0%E3%80%80%E5%8F%97%E6%8E%A7%E8%87%AA%E8%BF%9B%E5%8C%96.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第 23 章　受控自进化
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第 24 章　Agent 边缘运行时与全球优化
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="%E7%AC%AC%2024%20%E7%AB%A0%E3%80%80Agent%20%E8%BE%B9%E7%BC%98%E8%BF%90%E8%A1%8C%E6%97%B6%E4%B8%8E%E5%85%A8%E7%90%83%E4%BC%98%E5%8C%96.html" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第 24 章　Agent 边缘运行时与全球优化
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="目录">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      目录
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#241" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        24.1 全球化场景的边缘优化维度
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="24.1 全球化场景的边缘优化维度">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        四个边缘优化方向
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        中心云调优与边缘调优的分工
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#242-agent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        24.2 边缘评估：衡量 Agent 的全球交付质量
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="24.2 边缘评估：衡量 Agent 的全球交付质量">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        边缘评估指标体系
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        边缘评估数据回流
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#243" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        24.3 边缘性能与成本优化
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="24.3 边缘性能与成本优化">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        全球就近接入与智能路由
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ai" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        AI 推理传输优化
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_6" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        语义缓存与回源卸载
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#244" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        24.4 边缘数据驱动持续优化
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="24.4 边缘数据驱动持续优化">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_7" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        边缘数据为优化提供什么
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#esa-agent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        优化闭环中 ESA 与 Agent 平台的职责分工
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_8" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        从统一能力走向全球差异化优化
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#245-skillcontext" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        24.5 边缘内容分发：让 Skill/Context 到达全球边缘
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="24.5 边缘内容分发：让 Skill/Context 到达全球边缘">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_9" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        边缘版本同步与就近读取
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_10" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        区域适配
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#agent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Agent 友好内容转换
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#webmcp-mcp-server" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        WebMCP：网站即 MCP Server
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#246-region" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        24.6 边缘安全：请求到达 Region 之前的第一道防线
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="24.6 边缘安全：请求到达 Region 之前的第一道防线">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_11" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        纵深安全的前置
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ai_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        AI 爬虫管理
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#region" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        边缘安全与 Region 安全的分层协作
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#247-agent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        24.7 边缘生产验证：用真实全球流量验证 Agent 行为
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="24.7 边缘生产验证：用真实全球流量验证 Agent 行为">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_12" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        边缘真实流量的观测能力
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_13" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        边缘生产验证与仿真的互补关系
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_14" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        边缘灰度发布与版本管理
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-region" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        验证结果的边缘-Region 联合评估
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#248" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        24.8 三阶段演进与企业成熟度模型
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="24.8 三阶段演进与企业成熟度模型">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#agent_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        阶段一：边缘基础设施增强 Agent
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#agent_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        阶段二：Agent 能力部署到边缘
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#agent_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        阶段三：Agent 原生部署在边缘
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_15" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        企业边缘优化成熟度模型（本书归纳，供企业自评参考）
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#249" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        24.9 能力状态、边界与企业决策
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="24.9 能力状态、边界与企业决策">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_16" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        能力状态矩阵
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_17" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        边缘优化的限制与不适用场景
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_18" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        企业决策建议
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2410" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        24.10 本章小结
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_9" >
+        
+          
+          <label class="md-nav__link" for="__nav_9" id="__nav_9_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    实践篇
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_9_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_9">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    实践篇
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../06-case-study/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    实践篇导读
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_9_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_9_2" id="__nav_9_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第 25 章　研发效能
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_9_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_9_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    第 25 章　研发效能
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../06-case-study/%E7%AC%AC25%E7%AB%A0%20%E7%A0%94%E5%8F%91%E6%95%88%E8%83%BD/ABACI%20%E5%86%85%E6%A0%B8%E8%A1%A5%E4%B8%81%E5%AE%9A%E5%90%91%E6%B5%8B%E8%AF%95%E4%B8%8E%E7%BC%BA%E9%99%B7%E6%A3%80%E6%B5%8B%E6%99%BA%E8%83%BD%E4%BD%93%20.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ABACI 内核补丁定向测试与缺陷检测智能体
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../06-case-study/%E7%AC%AC25%E7%AB%A0%20%E7%A0%94%E5%8F%91%E6%95%88%E8%83%BD/Kitta%EF%BC%9A%E9%A2%86%E5%9F%9F%E4%B8%93%E7%94%A8%20Code%20Review%20Agent.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Kitta：领域专用 Code Review Agent
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../06-case-study/%E7%AC%AC25%E7%AB%A0%20%E7%A0%94%E5%8F%91%E6%95%88%E8%83%BD/PatchPilot%20Agents%EF%BC%9A%E8%AE%A9%E5%86%85%E6%A0%B8%E8%A1%A5%E4%B8%81%E4%BA%A4%E4%BB%98%E6%88%90%E4%B8%BA%E5%8F%AF%E7%BC%96%E6%8E%92%E3%80%81%E5%8F%AF%E9%AA%8C%E8%AF%81%E7%9A%84%E5%B7%A5%E7%A8%8B%E9%97%AD%E7%8E%AF.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    PatchPilot Agents：让内核补丁交付成为可编排、可验证的工程闭环
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../06-case-study/%E7%AC%AC25%E7%AB%A0%20%E7%A0%94%E5%8F%91%E6%95%88%E8%83%BD/%E4%BB%8E%E6%8A%A5%E8%AD%A6%E5%88%B0%E8%87%AA%E5%8A%A8%E4%BF%AE%E5%A4%8D%EF%BC%8CPolarDB-X%20%E7%9A%84%20Loop%20%E5%B7%A5%E7%A8%8B%E5%AE%9E%E8%B7%B5.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    从报警到自动修复，PolarDB-X 的 Loop 工程实践
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../06-case-study/%E7%AC%AC25%E7%AB%A0%20%E7%A0%94%E5%8F%91%E6%95%88%E8%83%BD/%E4%BB%8E%E7%BC%96%E7%A0%81%E6%8F%90%E6%95%88%E5%88%B0%E7%AB%AF%E5%88%B0%E7%AB%AF%E4%BA%A4%E4%BB%98%EF%BC%8C%E4%BA%91%E9%80%9A%E4%BF%A1%E7%9A%84%E4%BA%BA%E6%9C%BA%E5%8D%8F%E4%BD%9C%E5%AE%9E%E8%B7%B5.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    从编码提效到端到端交付，云通信的人机协作实践
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../06-case-study/%E7%AC%AC25%E7%AB%A0%20%E7%A0%94%E5%8F%91%E6%95%88%E8%83%BD/%E4%BB%8E%E8%AF%84%E6%B5%8B%E9%A9%B1%E5%8A%A8%E5%88%B0%E7%AB%AF%E5%88%B0%E7%AB%AF%E4%BA%A4%E4%BB%98%EF%BC%9AAI%20Agent%20%E5%AE%89%E5%85%A8%E4%BA%A7%E5%93%81%E7%A0%94%E5%8F%91%E6%8F%90%E6%95%88%E5%AE%9E%E8%B7%B5.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    从评测驱动到端到端交付：AI Agent 安全产品研发提效实践
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../06-case-study/%E7%AC%AC25%E7%AB%A0%20%E7%A0%94%E5%8F%91%E6%95%88%E8%83%BD/%E5%A4%9A%20Agent%20%E7%BB%84%E6%88%90%E7%A0%94%E5%8F%91%E5%B0%8F%E9%98%9F%EF%BC%9AAI%20%E7%A0%94%E5%8F%91%E5%A6%82%E4%BD%95%E4%BB%8E%E5%86%99%E4%BB%A3%E7%A0%81%E8%B5%B0%E5%90%91%E7%AB%AF%E5%88%B0%E7%AB%AF%E4%BA%A4%E4%BB%98.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    多 Agent 组成研发小队：AI 研发如何从写代码走向端到端交付
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_9_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_9_3" id="__nav_9_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第 26 章　设计工程
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_9_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_9_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    第 26 章　设计工程
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../06-case-study/%E7%AC%AC26%E7%AB%A0%20%E8%AE%BE%E8%AE%A1%E5%B7%A5%E7%A8%8B/GenUI%EF%BC%9A%E8%AE%A9%20Agent%20%E4%BB%8E%E7%BB%99%E5%87%BA%E7%AD%94%E6%A1%88%E8%B5%B0%E5%90%91%E4%BA%A4%E4%BB%98%E7%BB%93%E6%9E%9C.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    GenUI：让 Agent 从给出答案走向交付结果
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../06-case-study/%E7%AC%AC26%E7%AB%A0%20%E8%AE%BE%E8%AE%A1%E5%B7%A5%E7%A8%8B/Vibe%20Designing%EF%BC%9A%E6%84%8F%E5%9B%BE%E9%A9%B1%E5%8A%A8%E7%9A%84AI%E8%AE%BE%E8%AE%A1%E8%8C%83%E5%BC%8F%E8%BF%9B%E5%8C%96.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Vibe Designing：意图驱动的 AI 设计范式进化
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_9_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_9_4" id="__nav_9_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第 27 章　运维、安全与企业 IT
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_9_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_9_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    第 27 章　运维、安全与企业 IT
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../06-case-study/%E7%AC%AC27%E7%AB%A0%20%E8%BF%90%E7%BB%B4%E3%80%81%E5%AE%89%E5%85%A8%E4%B8%8E%E4%BC%81%E4%B8%9AIT/%E5%90%89%E5%88%A9%E6%B1%BD%E8%BD%A6%E6%99%BA%E8%83%BD%E8%BF%90%E7%BB%B4%E7%9A%84%E8%90%BD%E5%9C%B0%E5%AE%9E%E8%B7%B5.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    吉利汽车智能运维的落地实践
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../06-case-study/%E7%AC%AC27%E7%AB%A0%20%E8%BF%90%E7%BB%B4%E3%80%81%E5%AE%89%E5%85%A8%E4%B8%8E%E4%BC%81%E4%B8%9AIT/%E5%A1%94%E6%96%AF%E6%B1%80%E4%B8%87%E5%BA%97%E8%BF%9E%E9%94%81%E7%9A%84%E6%99%BA%E8%83%BD%E8%BF%90%E7%BB%B4%E9%97%AD%E7%8E%AF%E5%AE%9E.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    塔斯汀万店连锁的智能运维闭环实践
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../06-case-study/%E7%AC%AC27%E7%AB%A0%20%E8%BF%90%E7%BB%B4%E3%80%81%E5%AE%89%E5%85%A8%E4%B8%8E%E4%BC%81%E4%B8%9AIT/%E7%95%85%E6%8D%B7%E9%80%9A%E7%9A%84%E5%8F%AF%E8%A7%82%E6%B5%8B%E4%B8%8E%E6%99%BA%E8%83%BD%E8%BF%90%E7%BB%B4%E5%AE%9E%E8%B7%B5.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    畅捷通的可观测与智能运维实践
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_9_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_9_5" id="__nav_9_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第 28 章　客户、销售与运营
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_9_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_9_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    第 28 章　客户、销售与运营
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../06-case-study/%E7%AC%AC28%E7%AB%A0%20%E5%AE%A2%E6%88%B7%E3%80%81%E9%94%80%E5%94%AE%E4%B8%8E%E8%BF%90%E8%90%A5/MiniMax%20%E6%9E%84%E5%BB%BA%E6%B5%B7%E9%87%8F%E9%95%BF%E5%91%A8%E6%9C%9F%E8%AE%B0%E5%BF%86%E6%95%B0%E6%8D%AE%E5%BA%95%E5%BA%A7%E7%9A%84%E5%AE%9E%E8%B7%B5.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    MiniMax 构建海量长周期记忆数据底座的实践
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../06-case-study/%E7%AC%AC28%E7%AB%A0%20%E5%AE%A2%E6%88%B7%E3%80%81%E9%94%80%E5%94%AE%E4%B8%8E%E8%BF%90%E8%90%A5/%E4%BC%9A%E8%AE%A1%E5%B8%88%E4%BA%8B%E5%8A%A1%E6%89%80%E4%BF%A1%E6%B0%B8%E4%B8%AD%E5%92%8C%E7%9A%84%E5%8A%9E%E5%85%AC%E6%8F%90%E6%95%88%E6%8E%A2%E7%B4%A2.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    会计师事务所信永中和的办公提效探索
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../06-case-study/%E7%AC%AC28%E7%AB%A0%20%E5%AE%A2%E6%88%B7%E3%80%81%E9%94%80%E5%94%AE%E4%B8%8E%E8%BF%90%E8%90%A5/%E5%93%94%E5%93%A9%E5%93%94%E5%93%A9%E6%9E%84%E5%BB%BA%E5%85%A8%E5%9F%9F%E5%86%85%E5%AE%B9%E6%B4%9E%E5%AF%9F%E7%9A%84%E5%AE%9E%E8%B7%B5.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    哔哩哔哩构建全域内容洞察的实践
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../06-case-study/%E7%AC%AC28%E7%AB%A0%20%E5%AE%A2%E6%88%B7%E3%80%81%E9%94%80%E5%94%AE%E4%B8%8E%E8%BF%90%E8%90%A5/%E8%BF%90%E8%90%A5%E5%88%86%E6%9E%90%20Data%20Agent%20%E5%AE%9E%E8%B7%B5.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    运营分析 Data Agent 实践
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../06-case-study/%E7%AC%AC%2029%20%E7%AB%A0%20%20GOAI%20Agent%20Infra%20%E8%B5%9B%E9%81%93%EF%BC%9A%E5%A4%9A%20Agent%20%E5%8D%8F%E5%90%8C%E7%9A%84%E5%89%8D%E6%B2%BF%E5%AE%9E%E8%B7%B5%E6%8E%A2%E7%B4%A2.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第 29 章　GOAI Agent Infra 赛道：多 Agent 协同的前沿实践探索
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_10" >
+        
+          
+          <label class="md-nav__link" for="__nav_10" id="__nav_10_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    总结与展望篇
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_10_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_10">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    总结与展望篇
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../07-conclusion/%E7%AC%AC%2030%20%E7%AB%A0%20%E4%BB%8E%20Agentic%20Application%20%E5%88%B0%20Agentic%20OS.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第 30 章　从 Agentic Application 到 Agentic OS
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="目录">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      目录
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#241" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        24.1 全球化场景的边缘优化维度
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="24.1 全球化场景的边缘优化维度">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        四个边缘优化方向
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        中心云调优与边缘调优的分工
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#242-agent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        24.2 边缘评估：衡量 Agent 的全球交付质量
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="24.2 边缘评估：衡量 Agent 的全球交付质量">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        边缘评估指标体系
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        边缘评估数据回流
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#243" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        24.3 边缘性能与成本优化
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="24.3 边缘性能与成本优化">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        全球就近接入与智能路由
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ai" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        AI 推理传输优化
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_6" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        语义缓存与回源卸载
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#244" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        24.4 边缘数据驱动持续优化
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="24.4 边缘数据驱动持续优化">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_7" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        边缘数据为优化提供什么
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#esa-agent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        优化闭环中 ESA 与 Agent 平台的职责分工
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_8" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        从统一能力走向全球差异化优化
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#245-skillcontext" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        24.5 边缘内容分发：让 Skill/Context 到达全球边缘
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="24.5 边缘内容分发：让 Skill/Context 到达全球边缘">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_9" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        边缘版本同步与就近读取
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_10" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        区域适配
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#agent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Agent 友好内容转换
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#webmcp-mcp-server" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        WebMCP：网站即 MCP Server
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#246-region" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        24.6 边缘安全：请求到达 Region 之前的第一道防线
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="24.6 边缘安全：请求到达 Region 之前的第一道防线">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_11" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        纵深安全的前置
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ai_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        AI 爬虫管理
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#region" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        边缘安全与 Region 安全的分层协作
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#247-agent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        24.7 边缘生产验证：用真实全球流量验证 Agent 行为
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="24.7 边缘生产验证：用真实全球流量验证 Agent 行为">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_12" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        边缘真实流量的观测能力
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_13" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        边缘生产验证与仿真的互补关系
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_14" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        边缘灰度发布与版本管理
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-region" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        验证结果的边缘-Region 联合评估
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#248" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        24.8 三阶段演进与企业成熟度模型
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="24.8 三阶段演进与企业成熟度模型">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#agent_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        阶段一：边缘基础设施增强 Agent
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#agent_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        阶段二：Agent 能力部署到边缘
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#agent_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        阶段三：Agent 原生部署在边缘
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_15" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        企业边缘优化成熟度模型（本书归纳，供企业自评参考）
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#249" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        24.9 能力状态、边界与企业决策
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="24.9 能力状态、边界与企业决策">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_16" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        能力状态矩阵
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_17" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        边缘优化的限制与不适用场景
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_18" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        企业决策建议
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2410" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        24.10 本章小结
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="24-agent">第 24 章　Agent 边缘运行时与全球优化<a class="headerlink" href="#24-agent" title="Permanent link">&para;</a></h1>
+<p>Agent 在 Region 内通过评估、仿真和持续优化达到生产标准后，全球化部署带来了一个新的优化维度，即用户分布在全球各地，流量从边缘进入，威胁在边缘发起，内容需要在边缘适配。Region 内成熟的调优体系可以进一步延伸到这些场景，让优化能力从 Region 扩展到离用户最近的边缘。Agentic Application 的参考架构中，Runtime 组件覆盖了 Region 内的执行基础设施——计算资源、网络、存储和沙箱隔离。本章将 Runtime 延伸到全球边缘，引入边缘优化维度，覆盖从 Agent 到用户之间的最后一公里。本章所描述的边缘优化能力，由阿里云边缘安全加速（ESA）平台提供基础设施支撑——ESA 在全球运营 3200+ 边缘节点，覆盖主要国家和地区的用户接入，具备就近接入、边缘计算和安全防护的一体化能力，是将调优体系从 Region 延伸到边缘的天然载体。</p>
+<h2 id="241">24.1 全球化场景的边缘优化维度<a class="headerlink" href="#241" title="Permanent link">&para;</a></h2>
+<h3 id="_1">四个边缘优化方向<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h3>
+<ul>
+<li>
+<p><strong>延迟不对称：</strong> Agent 端到端延迟可拆解为七个因素：排队、环境准备、模型推理、工具调用、网络传输、沙箱执行和人工等待。其中六个因素在 Region 内产生，只有网络传输由物理距离决定。一个部署在某个 Region 的 Agent，为跨洋用户提供推理服务时，网络传输在首 Token 延迟（TTFT）中的占比可能超过 40%（示例场景假设，需企业基线校准）——模型推理速度再快，也无法补偿这一物理瓶颈。边缘优化精准命中网络传输因素，在全球就近接入和传输加速两个层面补全端到端的延迟观测。</p>
+</li>
+<li>
+<p><strong>成本不透明：</strong> Agent 的 Token 成本、回源带宽成本和边缘请求成本分散在不同计费体系中。没有边缘层的统一计量和缓存优化，企业很难知道一次 Agent 调用的真实端到端成本，也无法通过语义缓存等手段降低重复推理的 Token 消耗。</p>
+</li>
+<li>
+<p><strong>安全前置：</strong> 红队测试和安全治理为 Agent 在 Region 内建立了完善的安全评估体系。边缘安全在此基础上进一步将防线前置——DDoS 攻击在边缘吸收清洗，Bot 爬虫在边缘识别拦截，Prompt Injection 在到达 Region 之前完成前置识别与初筛（间接注入等深层攻击仍需 Region 结合完整上下文检测），让安全从 Region 入口前移到网络边缘。</p>
+</li>
+<li>
+<p><strong>内容适配：</strong>工程化治理体系为 Prompt/Skill/Context 建立了完善的版本管理和发布流程。边缘内容分发在此基础上进一步优化——Agent 消费的大量 Web 外部内容，在边缘节点完成 HTML 转 Markdown 等格式转换（ESA 已发布能力），让 Agent 以原 URL 直接取到可消费形态，减少二次处理的延迟和 Token 消耗。</p>
+</li>
+</ul>
+<h3 id="_2">中心云调优与边缘调优的分工<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h3>
+<p>Region 级调优与边缘调优解决不同层次的问题，两者分层协作：</p>
+<table>
+<thead>
+<tr>
+<th>维度</th>
+<th>Region 级调优</th>
+<th>边缘调优（本章）</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>正确性</td>
+<td>Agent 的任务是否完成、结果是否正确</td>
+<td>—</td>
+</tr>
+<tr>
+<td>延迟</td>
+<td>模型推理延迟、工具调用延迟</td>
+<td>网络传输延迟、全球就近接入</td>
+</tr>
+<tr>
+<td>成本</td>
+<td>Token 单价、模型路由成本</td>
+<td>重复推理的缓存、回源带宽</td>
+</tr>
+<tr>
+<td>安全</td>
+<td>Agent 行为安全、数据访问控制</td>
+<td>请求到达 Region 之前的威胁拦截</td>
+</tr>
+<tr>
+<td>内容</td>
+<td>Prompt/Skill/Context 的版本管理</td>
+<td>外部内容的边缘转换与分发</td>
+</tr>
+<tr>
+<td>体验</td>
+<td>任务完成度、结果质量</td>
+<td>全球一致性体验、区域化适配</td>
+</tr>
+</tbody>
+</table>
+<p>分工原则是：边缘能处理的（缓存命中、安全拦截、就近路由），就不回源 Region；边缘处理不了的（复杂推理、状态变更、长任务执行），才进入 Region。判断“能处理”不能只看计算能力，还要看事实权威、身份与权限、写副作用、数据驻留和故障恢复语义，只有无需权威状态判定、无需写副作用、且符合数据驻留要求的请求才适合在边缘就地完成；涉及一致性、顺序和恢复语义的操作必须回到 Region 执行。</p>
+<h2 id="242-agent">24.2 边缘评估：衡量 Agent 的全球交付质量<a class="headerlink" href="#242-agent" title="Permanent link">&para;</a></h2>
+<p>评估体系在 Region 内已建立了完善的框架：回答质量评估、轨迹评估、工具评估、任务状态验证。边缘评估在此基础上进一步扩展——将全球用户的实际交付质量纳入评估体系。同一个 Agent 为东京用户提供服务的 TTFT 可能是 200ms，为圣保罗用户可能是 1200ms（示例场景假设，需企业基线校准），这种全球体验差异需要边缘维度的评估指标来衡量。</p>
+<h3 id="_3">边缘评估指标体系<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h3>
+<p>边缘评估指标从四个维度扩展 Region 内的评估体系。<strong>性能维度</strong>关注全球各区域的 TTFT（P50/P95/P99）、边缘到 Region 的传输延迟和长连接建立时间——这是延迟指标在空间维度上的直接延伸。<strong>成本维度</strong>追踪端到端调用成本（Token + 带宽 + 边缘请求费用）、语义缓存节省量和回源流量占比，让企业对每次 Agent 调用的真实全链路成本有完整认知。<strong>安全维度</strong>衡量边缘拦截率、DDoS 吸收量、Prompt Injection 检出率和 Bot 识别准确率，反映安全防线前置的效果。<strong>体验维度</strong>通过区域体验一致性评分、流式输出完整性和断连恢复成功率，衡量全球用户的体验均等程度。</p>
+<h3 id="_4">边缘评估数据回流<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h3>
+<p>边缘评估产生的指标数据通过统一的数据管道回流到 Region 内的评估体系中，与 Region 内的评估数据合并，形成 Agent 的"全球交付质量报告"。Agent Release 的准入基线应同时包含 Region 内指标和边缘指标——一个版本如果在全球 P95 延迟上未达标，即使 Region 内评估全部通过，也不应被发布。</p>
+<h2 id="243">24.3 边缘性能与成本优化<a class="headerlink" href="#243" title="Permanent link">&para;</a></h2>
+<h3 id="_5">全球就近接入与智能路由<a class="headerlink" href="#_5" title="Permanent link">&para;</a></h3>
+<p>ESA 的全球 Anycast 接入使用户请求被路由到最近的边缘节点，减少首跳延迟。ESA 边缘节点之间通过骨干网互联，智能路由算法根据实时网络状况选择最优路径。对于 Agent 场景，长连接优化（连接池复用、首窗参数调优）和缓冲策略（异步路由、流式转发）对降低 TTFT 尤其重要。当 Agent 系统部署在多个 Region 时，边缘网关根据延迟、成本、合规和当前负载动态选择目标 Region。</p>
+<h3 id="ai">AI 推理传输优化<a class="headerlink" href="#ai" title="Permanent link">&para;</a></h3>
+<p>Agent 的推理请求具有长连接、流式输出、大 Payload 的特征。边缘节点在四个层面做定向优化：协议栈首窗与区域化参数调优、长连接池复用、缓冲与异步路由减少回源等待、DSCP（差异化服务代码点，用于 IP 报文优先级标记）专线选路保障高优先级流量的传输质量。</p>
+<h3 id="_6">语义缓存与回源卸载<a class="headerlink" href="#_6" title="Permanent link">&para;</a></h3>
+<p>Agent 的大量请求具有语义相似性——不同用户问相似的问题，同一用户在不同时间重复相似的查询。语义缓存在边缘节点存储已有推理结果的摘要和答案，当新请求与缓存项的语义相似度超过阈值时直接返回缓存结果，节省 Token 消耗。语义缓存应限定在公开、幂等、低风险请求范围内，并把租户、权限域、地区、模型、Prompt 和知识版本纳入缓存键，定义 TTL（生存时间）、失效、来源标记和回源策略，避免跨租户泄露、越权、版本陈旧和个性化答案误命中。高频查询场景下，边缘缓存可以显著卸载回源流量，对应可观的 Token 成本节省。</p>
+<p><strong>成本评估指标：</strong> Token 节省量（缓存命中节省的 Token 数）、回源带宽减少比例、端到端调用成本变化、缓存命中率随时间的变化趋势。</p>
+<h2 id="244">24.4 边缘数据驱动持续优化<a class="headerlink" href="#244" title="Permanent link">&para;</a></h2>
+<p>Agent 上线后，全球用户的真实使用过程是持续优化的重要数据来源。</p>
+<p>ESA 边缘节点位于用户访问的第一跳，能够直接观察用户所在区域、网络状况、访问时延、缓存命中情况和安全风险。这些边缘观测数据为 Agent 平台的持续优化提供了真实、全球分布的信号来源——Region 内的运行日志记录了模型生成了什么、调用了哪个工具、返回了什么结果，边缘数据则补充了请求发生时的外部环境。将两类数据结合，Agent 平台不仅能看到问题，还能判断问题更可能来自模型指令（Prompt）、工具能力（Skill）、网络路由、缓存还是安全策略。</p>
+<h3 id="_7">边缘数据为优化提供什么<a class="headerlink" href="#_7" title="Permanent link">&para;</a></h3>
+<p>ESA 边缘节点能够持续采集全球各区域的运行数据，供 Agent 平台用于发现优化机会。同一个 Agent 在不同区域、网络和用户群体中，可能呈现完全不同的运行效果。边缘数据将这些差异暴露出来，帮助 Agent 平台识别重复出现的问题模式。</p>
+<table>
+<thead>
+<tr>
+<th>从边缘数据中观察到的现象</th>
+<th>可能说明的问题</th>
+<th>Agent 平台可以采取的优化</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>某些区域响应明显更慢</td>
+<td>当前服务节点并非当地最优选择</td>
+<td>调整模型与服务路由</td>
+</tr>
+<tr>
+<td>某个工具只在部分区域频繁超时</td>
+<td>工具可达性或网络链路存在区域差异</td>
+<td>调整工具路由、超时和重试策略</td>
+</tr>
+<tr>
+<td>缓存命中率在某些区域明显偏低</td>
+<td>缓存策略与该区域请求模式不匹配</td>
+<td>调整缓存键和 TTL 策略</td>
+</tr>
+<tr>
+<td>新型安全威胁在多个节点被拦截</td>
+<td>攻击方式发生变化，防护规则需要更新</td>
+<td>更新安全策略和拦截规则</td>
+</tr>
+<tr>
+<td>回源流量占比持续偏高</td>
+<td>缓存策略或路由配置未有效卸载流量</td>
+<td>调整缓存策略和回源规则</td>
+</tr>
+</tbody>
+</table>
+<p>这些现象单独看只是运行记录，经过聚合与关联分析后，才会成为优化依据。例如，某个工具在多个区域都失败，问题可能出在 Skill 本身；如果只在一个区域失败，更可能是网络或服务路由问题。前者需要修改 Skill，后者则应调整运行编排层（Harness）中的路由策略。边缘数据帮助 Agent 平台避免"看到失败就修改 Prompt"这类错误归因。</p>
+<h3 id="esa-agent">优化闭环中 ESA 与 Agent 平台的职责分工<a class="headerlink" href="#esa-agent" title="Permanent link">&para;</a></h3>
+<p>受控自进化闭环（记录、分析、修改、验证、回流）由 Agent 平台和团队共同完成，ESA 的角色是提供边缘观测数据：</p>
+<p><strong>ESA 提供：</strong></p>
+<p>边缘 Trace 数据：请求时延、缓存命中、安全拦截等基础设施层观测</p>
+<p>全球区域维度的差异化数据：不同区域的延迟分布、网络状况、威胁模式</p>
+<p>版本管理与灰度发布：支持 Agent 平台在边缘侧受控验证新策略</p>
+<p><strong>Agent 平台完成：</strong></p>
+<p>分析：将边缘 Trace 与 Region 内的模型输出、工具调用结果、任务完成情况关联分析，判断问题来自哪个环节</p>
+<p>修改：由团队基于分析结果生成优化策略，例如修改 Prompt、更新 Skill、调整模型路由或缓存策略</p>
+<p>验证：在小范围内灰度验证 Patch 效果，观察任务成功率、响应质量、时延、成本和安全指标</p>
+<p>回流：验证结果进入下一轮优化，形成持续改进闭环</p>
+<p>以区域性工具超时为例：ESA 边缘数据发现某一区域的工具调用失败明显增多；Agent 平台将其与其他区域对比，确认模型和 Skill 本身没有变化，问题集中在网络链路；Agent 平台据此生成路由策略 Patch，利用 ESA 版本管理的灰度环境在该区域的小部分流量中验证，通过调用成功率和时延判断是否改善，再决定是否扩大范围。</p>
+<p>这里的"自进化"由平台辅助数据分析，团队生成候选策略，并经过规则校验、人工审核或自动化评测后再灰度发布。原始数据还需遵循最小化采集、匿名化、访问控制和跨区域合规要求，确保优化能力建立在可治理的数据使用之上。</p>
+<h3 id="_8">从统一能力走向全球差异化优化<a class="headerlink" href="#_8" title="Permanent link">&para;</a></h3>
+<p>不同区域的网络质量、可用模型、工具服务、用户习惯、安全风险和合规要求各不相同，统一配置虽然便于管理，却很难在所有区域同时获得最优效果。</p>
+<p>更合理的方式是采用"全球统一基线 + 区域自适应策略"。Prompt、核心 Skill 和基础安全规则由全球统一治理，保证 Agent 的基本能力和行为一致；模型路由、服务节点、缓存、安全规则和工具调用策略，则可以根据各区域的真实流量进行调整。</p>
+<p>ESA 边缘节点持续提供各区域的运行数据，Agent 平台辅助团队完成跨区域比较、问题定位和优化方向判断。这样既能避免各区域独立演进造成能力割裂，也能让 Agent 适应不同市场的实际运行环境。</p>
+<h2 id="245-skillcontext">24.5 边缘内容分发：让 Skill/Context 到达全球边缘<a class="headerlink" href="#245-skillcontext" title="Permanent link">&para;</a></h2>
+<p>工程化治理在 Region 内已建立了 Prompt/Skill/Context 的版本管理、变更评审和发布流程。在此基础上，边缘内容分发进一步解决全球化场景下的分发问题——当 Agent 在全球多个 Region 或边缘节点运行时，能力资产的版本需要在所有执行点保持一致。如果一个边缘节点运行的是 Skill v1.2 而 Region 内已经是 v1.3，就会产生行为不一致和评估偏差。</p>
+<h3 id="_9">边缘版本同步与就近读取<a class="headerlink" href="#_9" title="Permanent link">&para;</a></h3>
+<p>Prompt/Skill/Context 发布后，通过全球分发机制同步到各边缘执行点（企业自建能力，可基于 ESA 边缘计算实现）。Agent 在边缘执行时就近读取这些资产，减少回源延迟。版本同步需要与变更评审流程联动——每次 Skill 发布触发边缘缓存刷新，并通过版本钉扎和激活协议明确各执行点当前生效的版本，避免并发写和断网降级下的版本漂移。</p>
+<h3 id="_10">区域适配<a class="headerlink" href="#_10" title="Permanent link">&para;</a></h3>
+<p>不同地区的 Agent 可能需要差异化的 Context 策略——语言偏好、合规要求、本地化知识库因地域而异。这里需要区分两种“一致性”：治理规则全球一致（版本管理、变更评审、发布流程统一），数据分布按驻留要求差异化（分类分级、脱敏、授权、驻留、保留和删除机制按区域合规执行）。边缘分发支持按区域配置 Context 变体，在统一治理规则的基础上实现区域化适配。</p>
+<h3 id="agent">Agent 友好内容转换<a class="headerlink" href="#agent" title="Permanent link">&para;</a></h3>
+<p>Agent 需要消费大量 Web 内容作为上下文。传统边缘网络以原始 HTML 形态回送内容，Agent 拿到后还需要解析和结构化。边缘节点在内容送达 Agent 之前完成格式转换——HTML 转 Markdown 是 ESA 已发布能力，摘要生成和向量化索引可作为企业参考实现——Agent 以原 URL 直接取到可消费形态，减少二次处理延迟和 Token 消耗。</p>
+<h3 id="webmcp-mcp-server">WebMCP：网站即 MCP Server<a class="headerlink" href="#webmcp-mcp-server" title="Permanent link">&para;</a></h3>
+<p>WebMCP 是一项处于早期提案和浏览器试验阶段的技术，让网站可以主动向 Agent 暴露可调用的 MCP 工具：网站通过 JavaScript API 或声明式 HTML 注册工具，Agent 不再需要视觉解析网页，而是通过结构化接口直接调用网站功能。人工确认是其中一种可用的授权机制，但并非所有支付、删除操作的统一强制规范。该技术尚属实验性，本节仅作前瞻性介绍。</p>
+<p>WebMCP 的核心价值在于重新定义 Agent 与 Web 的交互方式——从视觉解析转向结构化调用，降低 Agent 获取 Web 内容的成本和延迟。</p>
+<h2 id="246-region">24.6 边缘安全：请求到达 Region 之前的第一道防线<a class="headerlink" href="#246-region" title="Permanent link">&para;</a></h2>
+<p>前文的安全治理为 Agent 建立了全栈安全保护框架，覆盖应用安全、模型安全、数据安全、身份安全和系统网络安全五个层面，采用纵深防御策略。ESA 的边缘安全能力在此基础上将纵深防御的多道防线推进到网络边缘——DDoS 攻击在边缘吸收清洗，避免流量到达 Region 时才消耗带宽；Bot 爬虫在边缘识别拦截，减少无效请求的回源开销；模型安全层面的 Prompt Injection 防护也被前置到边缘 AI 护栏中，在语义攻击到达 Region 之前完成前置识别与初筛。边缘只能覆盖直接注入，检索内容、工具返回等间接注入仍需 Region 结合完整上下文执行检测与审计。</p>
+<h3 id="_11">纵深安全的前置<a class="headerlink" href="#_11" title="Permanent link">&para;</a></h3>
+<p>边缘节点完成三层安全过滤：</p>
+<ul>
+<li>
+<p><strong>网络层</strong>：DDoS 流量在边缘吸收清洗，只有合法流量进入回源链路</p>
+</li>
+<li>
+<p><strong>应用层</strong>：WAF（Web 应用防火墙）/Bot 管理识别传统 Web 攻击（SQL 注入、XSS 跨站脚本）和恶意爬虫</p>
+</li>
+<li>
+<p><strong>语义层</strong>：AI 护栏检测 Prompt Injection、越狱尝试、不合规内容、敏感数据泄露</p>
+</li>
+</ul>
+<p>AI 护栏与 WAF 的职责不同：WAF 侧重已知签名与规则的请求层攻击防护，AI 护栏侧重模型交互层面的攻击检测（“忽略之前的指令”、间接注入、角色扮演越狱）。两者在边缘协同运行，但边缘只能完成前置初筛，深层检测在 Region 完成。</p>
+<h3 id="ai_1">AI 爬虫管理<a class="headerlink" href="#ai_1" title="Permanent link">&para;</a></h3>
+<p>当网站的访问者从人类扩展到 AI Agent，ESA 提供 AI 爬虫生命周期管理：AI 爬虫管理（支持识别、观察和拦截 AI 爬虫）→ AI Bot Auth（身份认证，区分合法 Agent 和恶意爬虫）→ AI Crawl Control（精细管控，允许/限制/拒绝特定 Agent 的访问）→ Pay Per Crawl（将 AI 访问转化为客户的收益流）。这是 Agent 时代的新型商业模式。</p>
+<h3 id="region">边缘安全与 Region 安全的分层协作<a class="headerlink" href="#region" title="Permanent link">&para;</a></h3>
+<p>边缘安全负责"过滤"（拦截已知威胁、吸收攻击流量），Region 内安全负责"判断"（复杂的权限校验、行为分析、审计追踪）。两者通过安全事件共享联动——边缘拦截的攻击模式同步到 Region 内的安全策略引擎，Region 内发现的新型威胁规则下发到边缘节点。</p>
+<h2 id="247-agent">24.7 边缘生产验证：用真实全球流量验证 Agent 行为<a class="headerlink" href="#247-agent" title="Permanent link">&para;</a></h2>
+<p>仿真体系在 Region 内已建立了完整的框架，包含 Scenario Spec（场景定义规范）、User Simulation（用户行为模拟）、Environment Simulation（工具和网络环境模拟）和 Model Provider Replay（模型输出回放）四种核心仿真能力。仿真的本质是用合成数据测试 Agent 在假设场景下的行为，覆盖真实流量难以触达的边界和长尾场景。</p>
+<p>ESA 边缘节点提供了与仿真互补的另一种验证路径：用真实全球流量观察 Agent 上线后的实际表现。仿真回答的是"如果发生 X，Agent 会怎样"；边缘生产验证回答的是"全球真实用户实际发生了什么，Agent 表现如何"。两者共同构成 Agent 版本发布前后的完整验证闭环——仿真负责上线前的合成测试，边缘生产验证负责上线后的真实观测。</p>
+<h3 id="_12">边缘真实流量的观测能力<a class="headerlink" href="#_12" title="Permanent link">&para;</a></h3>
+<p>ESA 边缘节点位于用户访问的第一跳，能够直接观察全球各区域的真实运行情况：</p>
+<p><strong>请求分布：</strong>地域占比、高峰时段、请求路径偏好，反映全球用户实际使用模式</p>
+<p><strong>网络状况：</strong>端到端延迟、丢包率、连接中断频率和长连接稳定性，反映各区域真实网络环境</p>
+<p><strong>安全态势：</strong>DDoS 攻击模式、Bot 爬虫行为、Prompt Injection 实际检出情况，反映真实威胁分布</p>
+<p><strong>缓存效果：</strong>语义缓存命中率、回源流量占比，反映缓存策略在真实流量下的实际效果</p>
+<p>ESA 边缘节点记录的是全球真实用户在生产环境中的实际表现。例如，边缘节点能观察到东南亚区域实际有多少用户遇到了网络中断、恢复策略实际表现如何、缓存命中率是否达到预期。</p>
+<h3 id="_13">边缘生产验证与仿真的互补关系<a class="headerlink" href="#_13" title="Permanent link">&para;</a></h3>
+<p>边缘生产验证与仿真在验证 Agent 行为时各有侧重：</p>
+<table>
+<thead>
+<tr>
+<th>维度</th>
+<th>仿真（上线前）</th>
+<th>边缘生产验证（上线后）</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>数据来源</td>
+<td>合成场景、模拟用户</td>
+<td>全球真实用户请求</td>
+</tr>
+<tr>
+<td>覆盖范围</td>
+<td>边界和长尾场景</td>
+<td>主流场景和真实分布</td>
+</tr>
+<tr>
+<td>网络条件</td>
+<td>模拟的延迟/丢包参数</td>
+<td>各区域实际网络状况</td>
+</tr>
+<tr>
+<td>安全威胁</td>
+<td>红队构造的攻击样本</td>
+<td>真实攻击流量和模式</td>
+</tr>
+<tr>
+<td>验证目的</td>
+<td>Agent 是否能应对假设场景</td>
+<td>Agent 在真实环境中表现如何</td>
+</tr>
+</tbody>
+</table>
+<p>两者互补的典型场景：仿真验证 Agent 能处理 3 秒超时的弱网场景后，版本发布上线；边缘生产验证发现东南亚区域实际有 5% 的请求遭遇超过 5 秒的延迟，导致 Agent 流式输出中断率高于预期。此时可以回到仿真体系，用边缘观测到的真实网络参数补充新的测试场景，形成"仿真 → 上线 → 边缘验证 → 回流仿真"的闭环。</p>
+<h3 id="_14">边缘灰度发布与版本管理<a class="headerlink" href="#_14" title="Permanent link">&para;</a></h3>
+<p>ESA 提供站点级版本管理能力，支持开发、灰度、生产三套环境。每个版本基于现有配置克隆生成，可以先在开发环境测试，再提升到灰度环境按请求规则导入部分流量验证，最终提升到生产环境全量生效。版本支持切换和回滚，异常时可以快速回退到上一版本。</p>
+<p>这一能力使边缘生产验证不仅限于观测，还能在真实流量上执行受控的版本验证。新版本的缓存规则、安全策略或路由配置先在灰度环境对部分真实流量生效，边缘节点持续观察任务成功率、响应时延、缓存命中率和安全拦截率等指标。验证通过后提升到生产环境全量发布；如果指标异常，直接回滚到上一版本。整个过程中，真实流量既是验证对象，也是真实流量既是验证对象，也是 Agent 平台判断版本是否达到发布标准的依据。</p>
+<h3 id="-region">验证结果的边缘-Region 联合评估<a class="headerlink" href="#-region" title="Permanent link">&para;</a></h3>
+<p>Agent 版本发布的准入基线应同时包含 Region 内指标（回答正确率、任务完成率）和边缘指标（全球延迟分布、缓存命中率、安全拦截率）。一个版本如果在全球 P95 延迟或边缘缓存命中率上未达标，即使 Region 内仿真全部通过，也不应被发布。Agent 平台基于这些数据判断版本是否达到发布标准。边缘生产验证将发布准入从 Region 内扩展到全球维度。</p>
+<h2 id="248">24.8 三阶段演进与企业成熟度模型<a class="headerlink" href="#248" title="Permanent link">&para;</a></h2>
+<p>企业不需要从第一天就建设完整的边缘优化体系。根据 Agent 业务的全球化程度和边缘能力成熟度，可以分为三个阶段渐进演进。</p>
+<p><img alt="image.png" src="../assets/imgs/chapter-24/image-001.png" /></p>
+<p>图24-1 Agent 边缘优化三阶段演进</p>
+<h3 id="agent_1">阶段一：边缘基础设施增强 Agent<a class="headerlink" href="#agent_1" title="Permanent link">&para;</a></h3>
+<p>最小侵入的优化阶段。Agent 的业务代码基本不变，只需调整网络接入配置，在网络层增加一个 ESA 边缘加速和安全层。这是大多数企业应该首先考虑的阶段——投入最小，效果可量化。</p>
+<p>具体能力包括：Anycast 就近接入（用户请求自动路由到最近的边缘节点）、智能路由（边缘节点之间通过骨干网互联，根据实时网络状况选择最优回源路径）、DDoS 清洗（攻击流量在边缘吸收，只有合法流量进入回源链路）、WAF/Bot 防护（SQL 注入、XSS、恶意爬虫在边缘拦截）、静态资源缓存和 SSL 卸载。</p>
+<p>实施路径通常分四步：ESA 接入与 DNS 切换→全球基线延迟测量→重点区域效果验证→全球生效。整个过程通常只需数天（示例评估，实际周期取决于企业现有架构与配置复杂度），不影响 Agent 的任何业务逻辑。</p>
+<p>适用条件：Agent 已有稳定的 Region 部署，需要改善全球延迟和安全防护，但不想改动应用架构。</p>
+<p>评估指标：全球 P50/P95 延迟改善比例、边缘安全拦截率、回源带宽减少量。</p>
+<h3 id="agent_2">阶段二：Agent 能力部署到边缘<a class="headerlink" href="#agent_2" title="Permanent link">&para;</a></h3>
+<p>部分 Agent 能力开始在 ESA 边缘节点执行，而不仅仅是被加速和保护。具体能力包括：ESA AI 加速网关（已发布，语义缓存、模型路由、Token 计量在边缘完成，具体命中策略为企业参考实现）、Agent 友好内容转换（HTML→Markdown、向量化等为企业参考实现）、WebMCP（实验性技术）、轻量推理（边缘节点运行小型模型完成预处理或分类）。</p>
+<p>适用条件：Agent 的 Token 成本或内容处理延迟已成为瓶颈，需要通过边缘缓存和预处理降低 Region 压力。</p>
+<p>评估指标：语义缓存命中率、Token 节省量、内容转换延迟、边缘处理的请求占比。</p>
+<h3 id="agent_3">阶段三：Agent 原生部署在边缘<a class="headerlink" href="#agent_3" title="Permanent link">&para;</a></h3>
+<p>终态愿景。分布式 Agent 系统的默认部署拓扑是边缘优先，中心云做兜底和重计算。这个阶段的核心架构变化是引入 Agent 两级运行时和边缘 AI 加速网关，从调优视角重构 Agent 的全球执行拓扑。</p>
+<p><img alt="image.png" src="../assets/imgs/chapter-24/image-002.png" /></p>
+<p>图24-2 Agent 两级运行时架构（本书参考架构与愿景设计）</p>
+<p><strong>Agent 两级运行时：ESA EdgeFunction + RegionFunction。</strong></p>
+<p>Agent Runtime 的三平面架构（控制/状态/执行）为边缘部署提供了基础，分布式部署进一步解决了 Agent 从单机走向多 Region 的问题——部署拓扑从单 Region 集中式演进到多 Region 主备，再到多 Region 多活。阶段三在此基础上迈出下一步：从“多 Region”演进到“边缘优先”。“逻辑单例、物理可替换”原则和状态外置设计天然适配边缘架构——边缘函数是轻量化的执行实例，云函数是完整的逻辑单例，两者通过状态外置保持行为一致。状态外置需要配套权威源、版本钉扎、激活协议、并发写控制、断网降级和回滚规则，才能保证边缘与 Region 行为真正一致。</p>
+<ul>
+<li>
+<p><strong>EdgeFunction（边缘函数，近用户侧部署）</strong>：由 ESA 边缘计算平台承载，部署在离用户最近的边缘节点上，处理对延迟敏感的前置逻辑——鉴权校验、路由决策、请求改写、缓存查询、安全过滤。ESA 边缘函数基于 V8 Isolate 的 JavaScript 运行环境（当前支持 JavaScript ES6），提供轻量级进程隔离，用户请求在“第一跳”即可完成处理，无需跨越网络回到数据中心。</p>
+</li>
+<li>
+<p><strong>RegionFunction（云函数，近源侧部署）</strong>：部署在离源站更近的 ESA 节点中，处理需要持久状态和深度计算的 Agent 逻辑——多轮对话上下文管理、工具调用编排、模型推理调度、长期记忆读写、沙箱隔离执行。云函数紧邻模型服务、数据库和业务系统，适合对计算资源和数据访问要求更高的重型任务。</p>
+</li>
+</ul>
+<p>两级架构的核心思路是：<strong>不是所有 Agent 请求都需要回到数据中心处理。</strong> 以一个典型的客服 Agent 为例，大量请求可以通过边缘缓存命中、简单路由或轻量预处理在用户侧就近完成，只有涉及复杂推理和深度工具调用的请求才需要进入数据中心。两级运行时让大部分请求在边缘完成，大幅降低全球用户的端到端延迟，同时减少数据中心侧的计算压力。</p>
+<p>以一个具体场景说明两级架构的运行方式。一位西班牙语用户向客服 Agent 询问退货政策，请求到达最近的边缘节点（马德里）。EdgeFunction 首先完成鉴权和请求预处理，然后在语义缓存中查找——该用户所在地区此前已有多次类似查询，缓存命中，边缘直接返回已缓存的退货政策摘要，整个过程延迟不到 50ms（示例场景假设，需企业基线校准）。如果用户追问一个从未出现过的复杂问题（缓存未命中），EdgeFunction 将请求连同预处理结果一起转发到数据中心的 RegionFunction，由后者完成完整的多轮推理、工具调用和订单查询，结果再写回边缘缓存供后续相似查询使用。</p>
+<p><strong>两级运行时的关键调优指标：</strong></p>
+<table>
+<thead>
+<tr>
+<th>指标</th>
+<th>含义</th>
+<th>优化目标</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>边缘处理比例</td>
+<td>在 EdgeFunction 层完成的请求占比</td>
+<td>按任务风险与业务 SLO 设置目标，正确性优先，而非单一最大化</td>
+</tr>
+<tr>
+<td>EdgeFunction 冷启动时间</td>
+<td>边缘函数从加载到可执行的时间</td>
+<td>&lt;1ms（示例目标）</td>
+</tr>
+<tr>
+<td>路由决策延迟</td>
+<td>EdgeFunction 判断请求走边缘还是 Region 的时间</td>
+<td>&lt;5ms（示例目标）</td>
+</tr>
+<tr>
+<td>RegionFunction 会话保持率</td>
+<td>长会话 Agent 在 Region 内的状态连续性</td>
+<td>不可中断</td>
+</tr>
+<tr>
+<td>边缘-Region 故障转移时间</td>
+<td>边缘节点不可用时切换到 Region 或相邻边缘的时间</td>
+<td>&lt;3s（示例目标）</td>
+</tr>
+</tbody>
+</table>
+<p>以上指标为架构示例目标，并非 ESA 产品现状指标，企业应根据自身基线和压测结果校准。</p>
+<p><strong>ESA AI 加速网关：面向 AI 流量的边缘网关。</strong></p>
+<p>ESA AI 加速网关是基于边缘接入特性构建的 AI 网关，与中心 AI 网关的定位和目标场景不同。本质上，这是部署差异带来的使用特性区别：中心 AI 网关部署在 Region 内，ESA AI 加速网关则部署在遍布全球的边缘节点上。基于 ESA 的边缘特征，AI 加速网关更多用于全球服务的业务场景——AI 流量从离用户最近的边缘节点进入并就地完成治理。</p>
+<p>ESA AI 加速网关提供了在边缘的独特能力：</p>
+<table>
+<thead>
+<tr>
+<th>处理环节</th>
+<th>能力</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>缓存</td>
+<td>语义缓存：相似请求的边缘命中，节省 Token</td>
+</tr>
+<tr>
+<td>传输</td>
+<td>长连接加速：协议栈调优、流式转发、首窗优化</td>
+</tr>
+<tr>
+<td>内容</td>
+<td>HTML→Markdown 转换：大幅减少 Agent 消费 Web 内容时的 Token 消耗</td>
+</tr>
+<tr>
+<td>计量</td>
+<td>边缘 Token 预估和请求计数</td>
+</tr>
+<tr>
+<td>过滤</td>
+<td>AI 护栏前置过滤：拦截明显违规请求</td>
+</tr>
+<tr>
+<td>调度</td>
+<td>高 QPS（每秒请求数）调度：边缘层吸收流量峰值</td>
+</tr>
+</tbody>
+</table>
+<p>边缘 AI 加速网关的独特价值来自边缘接入的位置特性：请求在第一跳完成缓存查询、格式转换、传输优化与安全过滤，缓存命中直接返回，未命中再回源 Region，全球用户都能获得一致的低延迟体验。能力边界也需要明确：语义缓存只覆盖公开、幂等、低风险请求，涉及写副作用和权威状态的请求仍需回到 Region 内执行，以保证正确性与一致性。</p>
+<p>ESA AI 加速网关的关键调优指标： Token 节省率（HTML→MD 转换 + 语义缓存的综合效果）、边缘缓存命中率、长连接加速带来的 TTFT 改善、边缘过滤拦截率（违规请求在回源之前被拦截的比例）。</p>
+<p><strong>阶段三的适用条件和评估体系：</strong></p>
+<p>适用条件：Agent 的全球化规模和延迟要求使得边缘优先成为架构必选项，而非优化选项。典型信号包括：需要为每个区域独立部署完整 Agent 系统且运维成本不可控、全球 TTFT 中网络传输占比超过 30%（示例场景假设，需企业基线校准）、Token 成本随用户增长线性上升且无有效缓存手段。</p>
+<p>评估指标：边缘处理的 Agent 请求占比、全球 Agent 可用性（SLA，服务等级协议）、边缘-Region 故障转移成功率、端到端 TTFT 改善幅度、Token 成本节省率。</p>
+<p>三个阶段的关系与"选择最低充分架构"原则一致——边缘优化同样不追求最高阶段，而是根据业务的全球化程度选择成本与收益最优的阶段。大多数企业长期停留在阶段一或阶段二即可获得显著收益，只有全球化规模达到一定量级后，阶段三才成为架构必选项。</p>
+<h3 id="_15">企业边缘优化成熟度模型（本书归纳，供企业自评参考）<a class="headerlink" href="#_15" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>成熟度</th>
+<th>边缘优化能力</th>
+<th>与调优体系的集成度</th>
+<th>典型表现</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>L1</td>
+<td>无边缘优化，Agent 直连 Region</td>
+<td>无</td>
+<td>全球延迟差异大，安全依赖 Region 内防护</td>
+</tr>
+<tr>
+<td>L2</td>
+<td>接入边缘加速与安全，独立看板</td>
+<td>未进入评估闭环</td>
+<td>延迟改善但无法量化 ROI（投资回报率），安全规则手动维护</td>
+</tr>
+<tr>
+<td>L3</td>
+<td>边缘指标纳入 Agent Release 准入基线</td>
+<td>评估闭环（与评估体系衔接）</td>
+<td>版本发布需通过边缘性能回归，缓存策略与 Agent 版本绑定</td>
+</tr>
+<tr>
+<td>L4</td>
+<td>边缘数据驱动自进化</td>
+<td>全自动闭环（与自进化闭环衔接）</td>
+<td>缓存/路由/安全策略根据边缘 Trace 自动优化，经灰度验证后生效</td>
+</tr>
+</tbody>
+</table>
+<p>成熟度不是越高越好。L1 适合仅在单一区域运营的企业；L2 适合全球化初期；L3 适合 Agent 进入生产后需要严格质量门禁的阶段；L4 适合大规模全球化运营。这一模型在演进方向上与部署成熟度模型（M1-M5）大致呼应——边缘优化是部署成熟度演进到高级阶段后的自然需求——但两者并不存在一一对应的映射关系，每级能力应有可验证的门槛，而非仅凭定性描述。</p>
+<p><strong>企业如何判断自己处于哪个阶段：</strong></p>
+<table>
+<thead>
+<tr>
+<th>信号</th>
+<th>阶段判断</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>全球用户抱怨延迟高，但 Region 内指标正常</td>
+<td>需要阶段一</td>
+</tr>
+<tr>
+<td>Token 成本随用户增长线性上升，无明显缓存效果</td>
+<td>需要阶段二</td>
+</tr>
+<tr>
+<td>需要为每个区域独立部署完整 Agent 系统，运维成本不可控</td>
+<td>需要阶段三</td>
+</tr>
+<tr>
+<td>当前只在单一 Region 运行，用户主要在同一区域</td>
+<td>暂不需要边缘优化</td>
+</tr>
+</tbody>
+</table>
+<h2 id="249">24.9 能力状态、边界与企业决策<a class="headerlink" href="#249" title="Permanent link">&para;</a></h2>
+<p>本章涉及的技术与产品能力处于不同成熟阶段，统一标注如下。</p>
+<h3 id="_16">能力状态矩阵<a class="headerlink" href="#_16" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>能力</th>
+<th>状态</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Anycast 就近接入、智能路由</td>
+<td>ESA 已发布</td>
+<td>用户请求路由到最近边缘节点，按实时网络状况选路</td>
+</tr>
+<tr>
+<td>边缘节点骨干网互联、DSCP 专线选路</td>
+<td>ESA 已发布</td>
+<td>保障回源与高优先级流量的传输质量</td>
+</tr>
+<tr>
+<td>DDoS 清洗、WAF/Bot 防护</td>
+<td>ESA 已发布</td>
+<td>攻击流量在边缘吸收，传统 Web 攻击边缘拦截</td>
+</tr>
+<tr>
+<td>AI 护栏前置过滤</td>
+<td>ESA 已发布</td>
+<td>边缘完成直接注入的前置识别与初筛，深层检测在 Region</td>
+</tr>
+<tr>
+<td>HTML→Markdown 转换</td>
+<td>ESA 已发布</td>
+<td>减少 Agent 消费 Web 内容的 Token 消耗</td>
+</tr>
+<tr>
+<td>AI 爬虫管理</td>
+<td>ESA 已发布</td>
+<td>识别、观察和拦截 AI 爬虫</td>
+</tr>
+<tr>
+<td>AI Bot Auth、AI Crawl Control、Pay Per Crawl</td>
+<td>ESA 已发布</td>
+<td>AI 爬虫生命周期管理的后续能力</td>
+</tr>
+<tr>
+<td>Agent 两级运行时</td>
+<td>本书参考架构与愿景设计</td>
+<td>非 ESA 产品现状</td>
+</tr>
+<tr>
+<td>语义缓存命中策略与缓存键设计</td>
+<td>企业参考实现</td>
+<td>ESA AI 网关提供基础缓存能力，本章的缓存键、TTL 与回源策略为设计建议</td>
+</tr>
+<tr>
+<td>WebMCP</td>
+<td>实验性技术</td>
+<td>试验阶段</td>
+</tr>
+<tr>
+<td>版本管理与灰度发布</td>
+<td>ESA 已发布</td>
+<td>边缘生产验证</td>
+</tr>
+</tbody>
+</table>
+<h3 id="_17">边缘优化的限制与不适用场景<a class="headerlink" href="#_17" title="Permanent link">&para;</a></h3>
+<p>边缘优化并非适用所有业务，以下场景需要审慎评估。</p>
+<p>单区域业务。用户集中在同一区域、与 Region 物理距离近的企业，边缘优化带来的延迟收益有限，投入可能不成比例。</p>
+<p>严格数据驻留要求。不允许跨区域缓存复制或要求数据不出特定司法辖区的场景，语义缓存与全球分发需要按区域合规配置，甚至放弃边缘缓存。</p>
+<p>高正确性风险的回答。个性化强、权限敏感、时效性高的内容不应进入语义缓存，否则可能造成错误答案误命中。</p>
+<p>边缘算力受限。复杂推理、长任务、大上下文处理仍需回源，边缘只承担预处理和粗筛。</p>
+<p>区域能力差异。不同区域的边缘节点能力、可用模型和合规要求不同，全球统一策略需要按区域适配，无法一刀切。</p>
+<p>成本反转。流量规模小或缓存命中率低时，边缘层的额外成本可能超过收益，此时阶段一甚至“不优化”才是正确选择。</p>
+<h3 id="_18">企业决策建议<a class="headerlink" href="#_18" title="Permanent link">&para;</a></h3>
+<p>企业应基于自身全球化程度、数据驻留要求、请求分布和成本结构，选择阶段一、阶段二或阶段三，并设定与业务 SLO 匹配的指标目标。本章出现的所有性能数字均为示例场景假设或架构示例目标，正式实施前必须由企业基线和压测校准。</p>
+<h2 id="2410">24.10 本章小结<a class="headerlink" href="#2410" title="Permanent link">&para;</a></h2>
+<p>调优篇在 Region 内构建了从评估、自进化、工程化治理、安全到仿真的完整优化闭环。当 Agent 的用户从单一区域扩展到全球，这个闭环需要进一步在空间维度上延伸——让 Region 内已经成熟的调优能力覆盖到边缘，到达离用户最近的位置。</p>
+<p>边缘优化是现有调优框架在空间维度上的延伸——评估体系扩展到边缘交付质量，自进化闭环扩展到边缘流量信号，工程化治理扩展到边缘分发，安全评估扩展到边缘攻击面，边缘生产验证补充仿真覆盖。ESA 边缘安全加速平台提供了执行这些延伸的基础设施能力，让调优从 Region 走到用户端，补全了调优体系的最后一公里。</p>
+<p>从 Region 到 Edge 的优化是一个渐进过程：先用 ESA 边缘基础设施增强 Agent（阶段一），再将部分能力部署到 ESA 边缘（阶段二），最终通过 Agent 两级运行时（ESA EdgeFunction + RegionFunction）和 ESA AI 加速网关让 Agent 原生运行在边缘（阶段三）。阶段三的核心洞察是：大多数 Agent 请求并不需要完整的 Region 级计算资源，边缘处理、按需回源的架构可以在不改变 Agent 核心逻辑的前提下，系统性地改善全球用户的延迟、成本和体验。每个阶段都有对应的评估指标和成熟度标准，企业应根据自身的全球化程度选择适当阶段，在生产数据的驱动下持续演进。</p>
+<p>从更大的视角看，边缘优先的部署拓扑也是结语中"Agentic OS"愿景的基础设施支撑——当 Agent 从单一应用走向操作系统级的协作生态，边缘层将成为 Agent 间通信、能力发现和任务调度的关键基础设施。Runtime 从 Region 延伸到边缘，是 Agentic Application 走向 Agentic OS 的必经之路。</p>
+<p><strong>从 Region 到 Edge，Agent 的运行时延伸到全球每一个角落。</strong></p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  回到页面顶部
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.tabs", "navigation.top", "search.suggest", "search.highlight", "content.code.copy"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "\u5df2\u590d\u5236", "clipboard.copy": "\u590d\u5236", "search.result.more.one": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.more.other": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 # \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.none": "\u6ca1\u6709\u627e\u5230\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.one": "\u627e\u5230 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.other": "# \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.placeholder": "\u952e\u5165\u4ee5\u5f00\u59cb\u641c\u7d22", "search.result.term.missing": "\u7f3a\u5c11", "select.version": "\u9009\u62e9\u5f53\u524d\u7248\u672c"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.d7400e89.min.js"></script>
+      
+    
+  </body>
+</html>

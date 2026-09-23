@@ -1,0 +1,3072 @@
+
+<!doctype html>
+<html lang="zh" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="阿里云 AI Agent 手白皮书 — 架构 · 构建 · 运行 · 治理 · 调优 · 实践">
+      
+      
+      
+      
+        <link rel="prev" href="%E7%AC%AC%2019%20%E7%AB%A0%E3%80%80Agent%20%E8%BD%A8%E8%BF%B9%E6%95%B0%E6%8D%AE.html">
+      
+      
+        <link rel="next" href="%E7%AC%AC%2021%20%E7%AB%A0%E3%80%80Agent%20%E9%BB%84%E9%87%91%E6%95%B0%E6%8D%AE%E9%9B%86.html">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+    
+    
+      
+        <title>第 20 章 Agent 运行时数据处理 - AI Agent 手白皮书</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.ec1eaa64.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#20-agent" class="md-skip">
+          跳转至
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="页眉">
+    <a href="../index.html" title="AI Agent 手白皮书" class="md-header__button md-logo" aria-label="AI Agent 手白皮书" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            AI Agent 手白皮书
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              第 20 章　Agent 运行时数据处理
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="切换到深色模式"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="切换到深色模式" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m17.75 4.09-2.53 1.94.91 3.06-2.63-1.81-2.63 1.81.91-3.06-2.53-1.94L12.44 4l1.06-3 1.06 3zm3.5 6.91-1.64 1.25.59 1.98-1.7-1.17-1.7 1.17.59-1.98L15.75 11l2.06-.05L18.5 9l.69 1.95zm-2.28 4.95c.83-.08 1.72 1.1 1.19 1.85-.32.45-.66.87-1.08 1.27C15.17 23 8.84 23 4.94 19.07c-3.91-3.9-3.91-10.24 0-14.14.4-.4.82-.76 1.27-1.08.75-.53 1.93.36 1.85 1.19-.27 2.86.69 5.83 2.89 8.02a9.96 9.96 0 0 0 8.02 2.89m-1.64 2.02a12.08 12.08 0 0 1-7.8-3.47c-2.17-2.19-3.33-5-3.49-7.82-2.81 3.14-2.7 7.96.31 10.98 3.02 3.01 7.84 3.12 10.98.31"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="切换到浅色模式"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="切换到浅色模式" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3m0-7 2.39 3.42C13.65 5.15 12.84 5 12 5s-1.65.15-2.39.42zM3.34 7l4.16-.35A7.2 7.2 0 0 0 5.94 8.5c-.44.74-.69 1.5-.83 2.29zm.02 10 1.76-3.77a7.131 7.131 0 0 0 2.38 4.14zM20.65 7l-1.77 3.79a7.02 7.02 0 0 0-2.38-4.15zm-.01 10-4.14.36c.59-.51 1.12-1.14 1.54-1.86.42-.73.69-1.5.83-2.29zM12 22l-2.41-3.44c.74.27 1.55.44 2.41.44.82 0 1.63-.17 2.37-.44z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="搜索" placeholder="搜索" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="查找">
+        
+        <button type="reset" class="md-search__icon md-icon" title="清空当前内容" aria-label="清空当前内容" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            正在初始化搜索引擎
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="标签" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../index.html" class="md-tabs__link">
+        
+  
+  
+    
+  
+  首页
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../2026-agent-survey-report.html" class="md-tabs__link">
+        
+  
+  
+    
+  
+  调研报告
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../00-preface/00-preface.html" class="md-tabs__link">
+        
+  
+  
+    
+  
+  前言
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../01-architecture/index.html" class="md-tabs__link">
+          
+  
+  
+  架构篇
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../02-build/index.html" class="md-tabs__link">
+          
+  
+  
+  构建篇
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../03-run/index.html" class="md-tabs__link">
+          
+  
+  
+  运行篇
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../04-governance/%E6%B2%BB%E7%90%86%E7%AF%87%E5%AF%BC%E8%AF%BB.html" class="md-tabs__link">
+          
+  
+  
+  治理篇
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="%E8%B0%83%E4%BC%98%E7%AF%87%E5%AF%BC%E8%AF%BB.html" class="md-tabs__link">
+          
+  
+  
+  调优篇
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../06-case-study/index.html" class="md-tabs__link">
+          
+  
+  
+  实践篇
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../07-conclusion/%E7%AC%AC%2030%20%E7%AB%A0%20%E4%BB%8E%20Agentic%20Application%20%E5%88%B0%20Agentic%20OS.html" class="md-tabs__link">
+          
+  
+  
+  总结与展望篇
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="导航栏" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../index.html" title="AI Agent 手白皮书" class="md-nav__button md-logo" aria-label="AI Agent 手白皮书" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    AI Agent 手白皮书
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    首页
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../2026-agent-survey-report.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    调研报告
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../00-preface/00-preface.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    前言
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    架构篇
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    架构篇
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../01-architecture/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    架构篇导读
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../01-architecture/%E7%AC%AC%201%20%E7%AB%A0%E3%80%80AI%20%E5%8E%9F%E7%94%9F%E5%BA%94%E7%94%A8%E7%9A%84%E6%96%B0%E9%98%B6%E6%AE%B5.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第 1 章　AI 原生应用的新阶段
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../01-architecture/%E7%AC%AC%202%20%E7%AB%A0%E3%80%80Agentic%20Application%20%E5%8F%82%E8%80%83%E6%9E%B6%E6%9E%84.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第 2 章　Agentic Application 参考架构
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    构建篇
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    构建篇
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../02-build/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    构建篇导读
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../02-build/%E7%AC%AC%203%20%E7%AB%A0%20%E8%8C%83%E5%BC%8F%EF%BC%9AHarness%20%E7%9A%84%E4%B8%BB%E6%B5%81%E6%9E%84%E5%BB%BA%E6%96%B9%E5%BC%8F%E5%92%8C%E8%B4%A3%E4%BB%BB%E8%BE%B9%E7%95%8C.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第 3 章　范式：Harness 的主流构建方式和责任边界
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../02-build/%E7%AC%AC%204%20%E7%AB%A0%20%E4%BB%BB%E5%8A%A1%EF%BC%9A%E7%BC%96%E6%8E%92%E3%80%81%E9%95%BF%E7%A8%8B%E6%8E%A8%E8%BF%9B%E4%B8%8E%E5%8D%8F%E4%BD%9C%E6%B5%81%E8%BD%AC.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第 4 章　任务：编排、长程推进与协作流转
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../02-build/%E7%AC%AC%205%20%E7%AB%A0%20%E4%BF%A1%E6%81%AF%EF%BC%9A%E4%B8%8A%E4%B8%8B%E6%96%87%E3%80%81%E7%8A%B6%E6%80%81%E4%B8%8E%E5%8F%AF%E5%A4%8D%E7%94%A8%E8%83%BD%E5%8A%9B%E8%B5%84%E4%BA%A7.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第 5 章　信息：上下文、状态与可复用能力资产
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../02-build/%E7%AC%AC%206%20%E7%AB%A0%20%E8%A1%8C%E5%8A%A8%EF%BC%9A%E5%8F%97%E6%8E%A7%E6%89%A7%E8%A1%8C%E3%80%81%E9%AA%8C%E8%AF%81%E5%8F%8D%E9%A6%88%E4%B8%8E%E4%BA%A4%E4%BB%98%E5%87%86%E5%A4%87.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第 6 章　行动：受控执行、验证反馈与交付准备
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    运行篇
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    运行篇
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../03-run/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    运行篇导读
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../03-run/%E7%AC%AC%207%20%E7%AB%A0%20%20Agent%20%E8%BF%90%E8%A1%8C%E6%97%B6%E4%B8%8E%E6%B2%99%E7%AE%B1.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第 7 章　Agent 运行时与沙箱
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../03-run/%E7%AC%AC%208%20%E7%AB%A0%20Agent%20%E7%8A%B6%E6%80%81%E5%AD%98%E5%82%A8%E4%B8%8E%E8%AF%AD%E4%B9%89%E8%B5%84%E4%BA%A7.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第 8 章　Agent 状态存储与语义资产
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../03-run/%E7%AC%AC%209%20%E7%AB%A0%20%20AI%20%E7%BD%91%E5%85%B3%E4%B8%8E%E7%BB%9F%E4%B8%80%E6%B5%81%E9%87%8F%E6%B2%BB%E7%90%86.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第 9 章　AI 网关与统一流量治理
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../03-run/%E7%AC%AC%2010%20%E7%AB%A0%20%20Agent%20%E5%BC%82%E6%AD%A5%E4%BB%BB%E5%8A%A1%E4%B8%8E%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%81%E7%A8%8B.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第 10 章　Agent 异步任务与自动化流程
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../03-run/%E7%AC%AC%2011%E7%AB%A0%20%20Multi-Agent%20%E5%8D%8F%E4%BD%9C%E4%B8%8E%E7%BC%96%E6%8E%92.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第 11 章　Multi-Agent 协作与编排
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../03-run/%E7%AC%AC%2012%20%E7%AB%A0%20Agent%20%E5%88%86%E5%B8%83%E5%BC%8F%E9%80%9A%E4%BF%A1.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第 12 章　Agent 分布式通信
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7" >
+        
+          
+          <label class="md-nav__link" for="__nav_7" id="__nav_7_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    治理篇
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    治理篇
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../04-governance/%E6%B2%BB%E7%90%86%E7%AF%87%E5%AF%BC%E8%AF%BB.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    治理篇导读
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../04-governance/%E7%AC%AC%2013%20%E7%AB%A0%E3%80%80Agent%20%E7%9A%84%E5%8F%AF%E8%A7%82%E6%B5%8B%E6%80%A7.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第 13 章　Agent 的可观测性
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../04-governance/%E7%AC%AC%2014%20%E7%AB%A0%E3%80%80Agent%20%E5%AE%89%E5%85%A8.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第 14 章　Agent 安全
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../04-governance/%E7%AC%AC%2015%20%E7%AB%A0%E3%80%80AI%20%E8%B5%84%E4%BA%A7%E7%9A%84%E5%8F%91%E7%8E%B0%E4%B8%8E%E7%AE%A1%E7%90%86%20.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第 15 章　AI 资产的发现与管理
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../04-governance/%E7%AC%AC%2016%20%E7%AB%A0%E3%80%80Agent%20%E8%A1%8C%E4%B8%BA%E7%94%9F%E6%88%90%E4%B8%8E%E8%B4%A8%E9%87%8F%E9%AA%8C%E8%AF%81.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第 16 章　Agent 行为生成与质量验证
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_8" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_8" id="__nav_8_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    调优篇
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_8_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_8">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    调优篇
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="%E8%B0%83%E4%BC%98%E7%AF%87%E5%AF%BC%E8%AF%BB.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    调优篇导读
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="%E7%AC%AC%2017%20%E7%AB%A0%E3%80%80%E6%A8%A1%E5%9E%8B%E8%B0%83%E4%BC%98.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第 17 章　模型调优
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="%E7%AC%AC%2018%20%E7%AB%A0%E3%80%80Agent%20%E8%B0%83%E4%BC%98%E6%80%BB%E8%A7%88.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第 18 章　Agent 调优总览
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="%E7%AC%AC%2019%20%E7%AB%A0%E3%80%80Agent%20%E8%BD%A8%E8%BF%B9%E6%95%B0%E6%8D%AE.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第 19 章　Agent 轨迹数据
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第 20 章　Agent 运行时数据处理
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="%E7%AC%AC%2020%20%E7%AB%A0%E3%80%80Agent%20%E8%BF%90%E8%A1%8C%E6%97%B6%E6%95%B0%E6%8D%AE%E5%A4%84%E7%90%86.html" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第 20 章　Agent 运行时数据处理
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="目录">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      目录
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#201-pipeline" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        20.1 Pipeline 能帮业务做哪些事
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#202" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        20.2 从合适的入口开始
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#203" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        20.3 完成第一条退款质检任务
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="20.3 完成第一条退款质检任务">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        选来源与字段
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        用预览确认这张表好不好用
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dataset" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        创建、运行，再到 Dataset 使用结果
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#204-ai" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        20.4 按实际用途加上采样和 AI 处理
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="20.4 按实际用途加上采样和 AI 处理">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        人工看不过来，先缩小到能处理的量
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        没有业务标签，让模型先做一版
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#205" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        20.5 从一次整理变成日常质检
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#206" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        20.6 第一次使用，先交付一批有人愿意用的数据
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="%E7%AC%AC%2021%20%E7%AB%A0%E3%80%80Agent%20%E9%BB%84%E9%87%91%E6%95%B0%E6%8D%AE%E9%9B%86.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第 21 章　Agent 黄金数据集
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="%E7%AC%AC%2022%20%E7%AB%A0%E3%80%80Agent%20%E4%BC%98%E5%8C%96%EF%BC%9ABadcase%20.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第 22 章　Agent 优化：Badcase
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="%E7%AC%AC%2023%20%E7%AB%A0%E3%80%80%E5%8F%97%E6%8E%A7%E8%87%AA%E8%BF%9B%E5%8C%96.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第 23 章　受控自进化
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="%E7%AC%AC%2024%20%E7%AB%A0%E3%80%80Agent%20%E8%BE%B9%E7%BC%98%E8%BF%90%E8%A1%8C%E6%97%B6%E4%B8%8E%E5%85%A8%E7%90%83%E4%BC%98%E5%8C%96.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第 24 章　Agent 边缘运行时与全球优化
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_9" >
+        
+          
+          <label class="md-nav__link" for="__nav_9" id="__nav_9_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    实践篇
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_9_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_9">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    实践篇
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../06-case-study/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    实践篇导读
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_9_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_9_2" id="__nav_9_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第 25 章　研发效能
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_9_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_9_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    第 25 章　研发效能
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../06-case-study/%E7%AC%AC25%E7%AB%A0%20%E7%A0%94%E5%8F%91%E6%95%88%E8%83%BD/ABACI%20%E5%86%85%E6%A0%B8%E8%A1%A5%E4%B8%81%E5%AE%9A%E5%90%91%E6%B5%8B%E8%AF%95%E4%B8%8E%E7%BC%BA%E9%99%B7%E6%A3%80%E6%B5%8B%E6%99%BA%E8%83%BD%E4%BD%93%20.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ABACI 内核补丁定向测试与缺陷检测智能体
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../06-case-study/%E7%AC%AC25%E7%AB%A0%20%E7%A0%94%E5%8F%91%E6%95%88%E8%83%BD/Kitta%EF%BC%9A%E9%A2%86%E5%9F%9F%E4%B8%93%E7%94%A8%20Code%20Review%20Agent.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Kitta：领域专用 Code Review Agent
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../06-case-study/%E7%AC%AC25%E7%AB%A0%20%E7%A0%94%E5%8F%91%E6%95%88%E8%83%BD/PatchPilot%20Agents%EF%BC%9A%E8%AE%A9%E5%86%85%E6%A0%B8%E8%A1%A5%E4%B8%81%E4%BA%A4%E4%BB%98%E6%88%90%E4%B8%BA%E5%8F%AF%E7%BC%96%E6%8E%92%E3%80%81%E5%8F%AF%E9%AA%8C%E8%AF%81%E7%9A%84%E5%B7%A5%E7%A8%8B%E9%97%AD%E7%8E%AF.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    PatchPilot Agents：让内核补丁交付成为可编排、可验证的工程闭环
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../06-case-study/%E7%AC%AC25%E7%AB%A0%20%E7%A0%94%E5%8F%91%E6%95%88%E8%83%BD/%E4%BB%8E%E6%8A%A5%E8%AD%A6%E5%88%B0%E8%87%AA%E5%8A%A8%E4%BF%AE%E5%A4%8D%EF%BC%8CPolarDB-X%20%E7%9A%84%20Loop%20%E5%B7%A5%E7%A8%8B%E5%AE%9E%E8%B7%B5.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    从报警到自动修复，PolarDB-X 的 Loop 工程实践
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../06-case-study/%E7%AC%AC25%E7%AB%A0%20%E7%A0%94%E5%8F%91%E6%95%88%E8%83%BD/%E4%BB%8E%E7%BC%96%E7%A0%81%E6%8F%90%E6%95%88%E5%88%B0%E7%AB%AF%E5%88%B0%E7%AB%AF%E4%BA%A4%E4%BB%98%EF%BC%8C%E4%BA%91%E9%80%9A%E4%BF%A1%E7%9A%84%E4%BA%BA%E6%9C%BA%E5%8D%8F%E4%BD%9C%E5%AE%9E%E8%B7%B5.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    从编码提效到端到端交付，云通信的人机协作实践
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../06-case-study/%E7%AC%AC25%E7%AB%A0%20%E7%A0%94%E5%8F%91%E6%95%88%E8%83%BD/%E4%BB%8E%E8%AF%84%E6%B5%8B%E9%A9%B1%E5%8A%A8%E5%88%B0%E7%AB%AF%E5%88%B0%E7%AB%AF%E4%BA%A4%E4%BB%98%EF%BC%9AAI%20Agent%20%E5%AE%89%E5%85%A8%E4%BA%A7%E5%93%81%E7%A0%94%E5%8F%91%E6%8F%90%E6%95%88%E5%AE%9E%E8%B7%B5.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    从评测驱动到端到端交付：AI Agent 安全产品研发提效实践
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../06-case-study/%E7%AC%AC25%E7%AB%A0%20%E7%A0%94%E5%8F%91%E6%95%88%E8%83%BD/%E5%A4%9A%20Agent%20%E7%BB%84%E6%88%90%E7%A0%94%E5%8F%91%E5%B0%8F%E9%98%9F%EF%BC%9AAI%20%E7%A0%94%E5%8F%91%E5%A6%82%E4%BD%95%E4%BB%8E%E5%86%99%E4%BB%A3%E7%A0%81%E8%B5%B0%E5%90%91%E7%AB%AF%E5%88%B0%E7%AB%AF%E4%BA%A4%E4%BB%98.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    多 Agent 组成研发小队：AI 研发如何从写代码走向端到端交付
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_9_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_9_3" id="__nav_9_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第 26 章　设计工程
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_9_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_9_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    第 26 章　设计工程
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../06-case-study/%E7%AC%AC26%E7%AB%A0%20%E8%AE%BE%E8%AE%A1%E5%B7%A5%E7%A8%8B/GenUI%EF%BC%9A%E8%AE%A9%20Agent%20%E4%BB%8E%E7%BB%99%E5%87%BA%E7%AD%94%E6%A1%88%E8%B5%B0%E5%90%91%E4%BA%A4%E4%BB%98%E7%BB%93%E6%9E%9C.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    GenUI：让 Agent 从给出答案走向交付结果
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../06-case-study/%E7%AC%AC26%E7%AB%A0%20%E8%AE%BE%E8%AE%A1%E5%B7%A5%E7%A8%8B/Vibe%20Designing%EF%BC%9A%E6%84%8F%E5%9B%BE%E9%A9%B1%E5%8A%A8%E7%9A%84AI%E8%AE%BE%E8%AE%A1%E8%8C%83%E5%BC%8F%E8%BF%9B%E5%8C%96.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Vibe Designing：意图驱动的 AI 设计范式进化
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_9_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_9_4" id="__nav_9_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第 27 章　运维、安全与企业 IT
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_9_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_9_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    第 27 章　运维、安全与企业 IT
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../06-case-study/%E7%AC%AC27%E7%AB%A0%20%E8%BF%90%E7%BB%B4%E3%80%81%E5%AE%89%E5%85%A8%E4%B8%8E%E4%BC%81%E4%B8%9AIT/%E5%90%89%E5%88%A9%E6%B1%BD%E8%BD%A6%E6%99%BA%E8%83%BD%E8%BF%90%E7%BB%B4%E7%9A%84%E8%90%BD%E5%9C%B0%E5%AE%9E%E8%B7%B5.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    吉利汽车智能运维的落地实践
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../06-case-study/%E7%AC%AC27%E7%AB%A0%20%E8%BF%90%E7%BB%B4%E3%80%81%E5%AE%89%E5%85%A8%E4%B8%8E%E4%BC%81%E4%B8%9AIT/%E5%A1%94%E6%96%AF%E6%B1%80%E4%B8%87%E5%BA%97%E8%BF%9E%E9%94%81%E7%9A%84%E6%99%BA%E8%83%BD%E8%BF%90%E7%BB%B4%E9%97%AD%E7%8E%AF%E5%AE%9E.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    塔斯汀万店连锁的智能运维闭环实践
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../06-case-study/%E7%AC%AC27%E7%AB%A0%20%E8%BF%90%E7%BB%B4%E3%80%81%E5%AE%89%E5%85%A8%E4%B8%8E%E4%BC%81%E4%B8%9AIT/%E7%95%85%E6%8D%B7%E9%80%9A%E7%9A%84%E5%8F%AF%E8%A7%82%E6%B5%8B%E4%B8%8E%E6%99%BA%E8%83%BD%E8%BF%90%E7%BB%B4%E5%AE%9E%E8%B7%B5.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    畅捷通的可观测与智能运维实践
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_9_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_9_5" id="__nav_9_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第 28 章　客户、销售与运营
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_9_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_9_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    第 28 章　客户、销售与运营
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../06-case-study/%E7%AC%AC28%E7%AB%A0%20%E5%AE%A2%E6%88%B7%E3%80%81%E9%94%80%E5%94%AE%E4%B8%8E%E8%BF%90%E8%90%A5/MiniMax%20%E6%9E%84%E5%BB%BA%E6%B5%B7%E9%87%8F%E9%95%BF%E5%91%A8%E6%9C%9F%E8%AE%B0%E5%BF%86%E6%95%B0%E6%8D%AE%E5%BA%95%E5%BA%A7%E7%9A%84%E5%AE%9E%E8%B7%B5.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    MiniMax 构建海量长周期记忆数据底座的实践
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../06-case-study/%E7%AC%AC28%E7%AB%A0%20%E5%AE%A2%E6%88%B7%E3%80%81%E9%94%80%E5%94%AE%E4%B8%8E%E8%BF%90%E8%90%A5/%E4%BC%9A%E8%AE%A1%E5%B8%88%E4%BA%8B%E5%8A%A1%E6%89%80%E4%BF%A1%E6%B0%B8%E4%B8%AD%E5%92%8C%E7%9A%84%E5%8A%9E%E5%85%AC%E6%8F%90%E6%95%88%E6%8E%A2%E7%B4%A2.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    会计师事务所信永中和的办公提效探索
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../06-case-study/%E7%AC%AC28%E7%AB%A0%20%E5%AE%A2%E6%88%B7%E3%80%81%E9%94%80%E5%94%AE%E4%B8%8E%E8%BF%90%E8%90%A5/%E5%93%94%E5%93%A9%E5%93%94%E5%93%A9%E6%9E%84%E5%BB%BA%E5%85%A8%E5%9F%9F%E5%86%85%E5%AE%B9%E6%B4%9E%E5%AF%9F%E7%9A%84%E5%AE%9E%E8%B7%B5.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    哔哩哔哩构建全域内容洞察的实践
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../06-case-study/%E7%AC%AC28%E7%AB%A0%20%E5%AE%A2%E6%88%B7%E3%80%81%E9%94%80%E5%94%AE%E4%B8%8E%E8%BF%90%E8%90%A5/%E8%BF%90%E8%90%A5%E5%88%86%E6%9E%90%20Data%20Agent%20%E5%AE%9E%E8%B7%B5.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    运营分析 Data Agent 实践
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../06-case-study/%E7%AC%AC%2029%20%E7%AB%A0%20%20GOAI%20Agent%20Infra%20%E8%B5%9B%E9%81%93%EF%BC%9A%E5%A4%9A%20Agent%20%E5%8D%8F%E5%90%8C%E7%9A%84%E5%89%8D%E6%B2%BF%E5%AE%9E%E8%B7%B5%E6%8E%A2%E7%B4%A2.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第 29 章　GOAI Agent Infra 赛道：多 Agent 协同的前沿实践探索
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_10" >
+        
+          
+          <label class="md-nav__link" for="__nav_10" id="__nav_10_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    总结与展望篇
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_10_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_10">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    总结与展望篇
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../07-conclusion/%E7%AC%AC%2030%20%E7%AB%A0%20%E4%BB%8E%20Agentic%20Application%20%E5%88%B0%20Agentic%20OS.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第 30 章　从 Agentic Application 到 Agentic OS
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="目录">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      目录
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#201-pipeline" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        20.1 Pipeline 能帮业务做哪些事
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#202" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        20.2 从合适的入口开始
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#203" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        20.3 完成第一条退款质检任务
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="20.3 完成第一条退款质检任务">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        选来源与字段
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        用预览确认这张表好不好用
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dataset" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        创建、运行，再到 Dataset 使用结果
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#204-ai" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        20.4 按实际用途加上采样和 AI 处理
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="20.4 按实际用途加上采样和 AI 处理">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        人工看不过来，先缩小到能处理的量
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        没有业务标签，让模型先做一版
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#205" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        20.5 从一次整理变成日常质检
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#206" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        20.6 第一次使用，先交付一批有人愿意用的数据
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="20-agent">第 20 章　Agent 运行时数据处理<a class="headerlink" href="#20-agent" title="Permanent link">&para;</a></h1>
+<p>客服负责人提出了一个具体要求：每天看一批退款对话，找出“工具没有办成，Agent 却告诉用户已经办好”的问题；改完提示词后，还要用这些案例检查问题有没有减少。</p>
+<p>运行记录已经接入，轨迹也能打开，但质检人员需要的是一张可以直接使用的表：用户问了什么、Agent 如何回答、执行了哪些操作，以及记录来自哪里。数据多了，还希望按业务分类、抽取样本，每天自动补充新数据。如果每次都由开发者导出日志、改脚本、整理表格，质检很难成为日常工作。</p>
+<p><strong>Pipeline 将这套整理方法保存为数据处理任务，按约定持续生成 Dataset。</strong> 应用开发者把业务字段接对，业务负责人围绕预览确认样本是否符合用途；之后，评估、人工复核和实验共用这些字段，减少反复找数据、解释数据的工作。</p>
+<p>在上一章中，我们已经得到可以阅读和回查的执行过程。本章接着说明，怎样将这些过程整理成业务用得上的样本。</p>
+<h2 id="201-pipeline">20.1 Pipeline 能帮业务做哪些事<a class="headerlink" href="#201-pipeline" title="Permanent link">&para;</a></h2>
+<p>Pipeline 的功能可以按要交付的结果来选择。多数任务只需要其中几项，无需把所有处理都加进去。</p>
+<table>
+<thead>
+<tr>
+<th>业务需要</th>
+<th>可以采用的处理</th>
+<th>得到什么、何时有用</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>把日志变成可读表格</td>
+<td>字段投影、字段扩展、条件过滤</td>
+<td>提取问题、回答、模型、耗时等字段，适合质检、分析和评估前的数据准备</td>
+</tr>
+<tr>
+<td>把分散事件整理为完整样本</td>
+<td>实例构建</td>
+<td>按已确认的任务或会话身份组装记录，适合输入仍是 Span、消息片段的应用</td>
+</tr>
+<tr>
+<td>从相似内容中整理题库</td>
+<td>精确去重、近似去重、语义去重</td>
+<td>减少相同或相近问题，降低题库维护与重复评估的工作量</td>
+</tr>
+<tr>
+<td>在有限预算内多看几类问题</td>
+<td>随机采样、分组采样、向量生成、语义聚类</td>
+<td>按比例、条数或类别选样，适合人工复核、专项排查与评估集扩充</td>
+</tr>
+<tr>
+<td>为样本补充业务信息</td>
+<td>LLM 调用、智能体调用</td>
+<td>分类、摘要、信息提取或生成候选标注，让筛选与分析更方便</td>
+</tr>
+<tr>
+<td>找出异常长的内容</td>
+<td>文本统计、条件过滤</td>
+<td>计算文本长度等特征，定位过长输入或工具返回，为内容治理和成本排查选样</td>
+</tr>
+<tr>
+<td>持续收集新数据</td>
+<td>单次执行、周期执行、运行历史</td>
+<td>先整理一个历史时间段，再按小时或天生产新样本，支撑日常质检</td>
+</tr>
+</tbody>
+</table>
+<p>同一份数据可以服务不同目的。客服团队需要问题与答复，开发者排查工具使用需要步骤和返回结果，成本分析还需要模型与消耗字段。可以保留共同的基础字段，再根据用途配置不同的处理任务和输出集合。</p>
+<p>选择之前，先明确一行代表什么。退款质检可以从“一次任务一行”开始；分析用户为何反复补充信息，需要连续多轮；比较多个并行 Agent，则要分别保留各条路径。这个选择决定了后面怎样分组、采样和评分，也决定业务人员打开表格后能否直接理解。</p>
+<h2 id="202">20.2 从合适的入口开始<a class="headerlink" href="#202" title="Permanent link">&para;</a></h2>
+<p>进入对应 AgentSpace，在“数据中心”的“数据处理”中点击“创建 Pipeline”。创建页支持选择来源、使用模板或让 Loopie 生成管线，并在同一流程中配置输出与调度。已经在整理 Dataset 的用户，也可以从创建数据集的“从轨迹数据导入”入口开始。</p>
+<p>选择来源时，可以这样判断：</p>
+<ul>
+<li>
+<p><strong>已有 Agent 轨迹，准备做评估：选“轨迹数据”。</strong> 页面使用当前空间关联的轨迹来源，可从“Agent 轨迹样本提取”推荐方案开始，直接提取输入、输出、会话与完整轨迹。</p>
+</li>
+<li>
+<p><strong>需要从调用日志提取业务字段：选“Trace 数据”。</strong> 查看页面带出的日志来源与应用范围，从推荐的问答提取方案开始；还需要其他字段或组装方式时，再修改处理模块。</p>
+</li>
+<li>
+<p><strong>只需问题与回答：优先选问答提取。</strong> 如果还要检查工具是否用对、失败后如何恢复，就保留完整过程，减少质检时重新找日志的工作。</p>
+</li>
+</ul>
+<p>页面按来源推荐处理方案，背后使用相应的预置模板。选择后，左侧“流水线”展示处理模块，点选模块即可查看配置，也可以通过“添加模块”补充采样、分类等处理。开发者熟悉字段时，直接改配置通常最快；需要更多处理步骤，也可以让 Loopie 生成后再调整。</p>
+<p>不熟悉原始结构时，可以先向 Loopie 描述目标。例如：</p>
+<blockquote>
+<p>整理退款客服最近一天的运行轨迹，一次任务一行。保留用户问题、实际答复、完整执行过程和来源 ID，输出到退款质检数据集。先给我看真实样本；没有最终答复的任务也保留，方便检查中断问题。</p>
+</blockquote>
+<p>Loopie 可以生成并将管线呈现在编辑器中，用户接着查看真实预览、补充要求。例如“这里取到的是系统包装后的问题，请改成业务入口原文”“增加一列区分退款申请和进度查询”。对话缩短了从业务要求到配置草稿的距离；确认结果后，这份配置就能用于后续数据生产。</p>
+<h2 id="203">20.3 完成第一条退款质检任务<a class="headerlink" href="#203" title="Permanent link">&para;</a></h2>
+<p>下面用一个教学示例走完流程。假设退款 Agent 已产生标准轨迹，我们先整理昨天的数据，输出到新数据集 refund_review_samples。首轮保留各次真实任务，便于看到相同问题成功与失败的不同处理。</p>
+<h3 id="_1">选来源与字段<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h3>
+<p>在创建页选择“轨迹数据”，找到“Agent 轨迹样本提取”推荐卡片，点击“选择此方案”。进入编辑器后，可以在“智能生成”中继续对话，也可以切到“手动配置”修改字段。先查看输入来源是否属于目标空间，再根据实际存在的服务或业务字段确定应用范围。若多个应用共用来源，可以让 Loopie 根据样本补充筛选规则。</p>
+<p>该方案将原有输入、输出和完整轨迹整理为以下字段。业务人员主要读前两列，评估器还能读取过程，开发者可以沿身份回查原记录。</p>
+<table>
+<thead>
+<tr>
+<th>输出字段</th>
+<th>内容</th>
+<th>退款示例中的用途</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>input</td>
+<td>用户输入</td>
+<td>“订单 1001 需要退款”</td>
+</tr>
+<tr>
+<td>output</td>
+<td>Agent 的最终答复</td>
+<td>“退款申请已经提交”</td>
+</tr>
+<tr>
+<td>agent_trajectory</td>
+<td>完整轨迹内容</td>
+<td>查看退款工具的参数、结果及后续回复</td>
+</tr>
+<tr>
+<td>trajectory_id、trace_id</td>
+<td>来源身份</td>
+<td>找到这次实际执行，供复核和排查</td>
+</tr>
+<tr>
+<td>session_id</td>
+<td>会话关联</td>
+<td>必要时联系前后交互</td>
+</tr>
+</tbody>
+</table>
+<p>其中，模板把源数据中的 atif_content 映射为 agent_trajectory，方便在后续评估中使用。若业务还需要渠道、订单类型等字段，可在“字段投影”或“字段扩展”模块中添加，并从真实样本确认其来源。</p>
+<p>字段选择应体现质检目标。检查“用户后来补充的退款原因有没有被使用”，应在输入或轨迹中保留补充信息；检查是否实际办理成功，则需要相应的工具反馈或业务结果。这样，评估器拿到的材料才足以回答具体问题。</p>
+<h3 id="_2">用预览确认这张表好不好用<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h3>
+<p>方案卡片提供“生成预览”；进入编辑器后，可以选择输出模块点击“预览”，查看整条管线的结果。选择有真实数据的时间范围，先展开一条普通任务的输入、输出和轨迹，确认质检人员能连续读懂；再找一条工具报错或没有答复的任务，看它是否保留下来。</p>
+<p>例如预览里出现：工具返回“缺少退款原因”，最终答复却是“退款已经提交”。这正是希望交给质检的样本。若只保留最后一句话，之后很难判断它为什么不对；如果过滤模块删掉了工具失败记录，也要调整条件。可以点选对应模块修改，再生成预览。</p>
+<p>预览还适合当场确定输出形态。较长的过程保留在结构化内容列中，列表先显示问题与回答；需要按渠道筛选的字段则单独成列。业务负责人用这几条样本确认“收到这样的表，是否已经能开始工作”，开发者据此收敛配置。</p>
+<h3 id="dataset">创建、运行，再到 Dataset 使用结果<a class="headerlink" href="#dataset" title="Permanent link">&para;</a></h3>
+<p>点击页面的“创建并启动”，进入“任务信息与调度策略”，填写任务名称、描述，选择“单次执行”，将处理时间明确设为昨天。在“输出”中填写新数据集名称 refund_review_samples。提交前再次看清时间范围，预览所选时间不一定就是正式执行时间。</p>
+<p>确认后再次点击“创建并启动”。系统创建输出数据集与处理任务，单次执行会进入运行队列。随后可在任务详情的“运行历史”查看数据窗口、状态、输出行数与耗时。执行完成后，回到“Pipeline 配置”，通过输出目标卡片的“跳转到数据集详情”图标进入 Dataset，按一条已知 trace_id 找到样本，展开字段读取。预览帮我们定方案，这一步让质检团队拿到可查询、可标注的数据。</p>
+<p>如果结果为空，先确认所选时段是否有记录，再检查应用筛选；字段大面积为空，就检查提取位置。初次运行用一个明确的时间段，可以较快分清是数据范围问题还是加工规则问题。</p>
+<h2 id="204-ai">20.4 按实际用途加上采样和 AI 处理<a class="headerlink" href="#204-ai" title="Permanent link">&para;</a></h2>
+<p>第一条任务只需要把材料整理清楚。开始使用之后，再根据复核量、场景覆盖和分析方式增加处理，更容易判断每一步是否有用。</p>
+<h3 id="_3">人工看不过来，先缩小到能处理的量<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h3>
+<p>假设质检人员一天能认真复核 100 条，可以增加“随机采样”模块，选择“按采样条数”，填写 100；需要让业务类别都有机会入选时，在“分组列”中选择已有类别字段，再设置每组采样条数。这里的 100 是示例工作量，应按实际人力调整。</p>
+<p>如果还不知道问题分为哪些类别，可以先用向量生成与语义聚类整理主题，再按聚类结果采样。例如从相似的“进度查询”里取少量代表，把更多阅读时间留给其他问题。这适合扩充题库和发现问题类型；需要估计线上总体失败率时，则保留具有代表性的抽样口径。</p>
+<p>内容去重适合另一个需求：已经选出不少案例，准备整理一份不重复的回归题库。在去重模块里选择比较字段；精确去重处理相同文字，近似去重处理细微改写，语义去重处理含义接近的不同表达。按问题去重前，要把结果和重要场景差异考虑进去，避免将同一道题的一次成功与一次失败混为一份。</p>
+<h3 id="_4">没有业务标签，让模型先做一版<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h3>
+<p>退款记录可以分成“申请退款”“查询进度”“退款被拒”等类别。原始数据没有这些标签时，在提取字段后增加“LLM 调用”模块，选择调用模型，填写自定义提示词，将“输出解析格式”设为“JSON格式”，把“输出列名”设为 scenario_label。</p>
+<p>可以从这样的提示词开始：</p>
+<blockquote>
+<p>根据用户输入 {{input}}，将本次任务归为“申请退款”“查询进度”“退款被拒”“其他”之一。只根据输入判断，不推断办理结果。返回 category 和 reason 两个字段；reason 简短说明分类依据。</p>
+</blockquote>
+<p>生成预览后，查看 scenario_label 中的类别和理由。遇到“已经申请三天了怎么还没到账”，应能归到进度查询；如果分类不符，补充类别解释和相近例子，再试一批样本。需要直接按类别列筛选时，可继续用字段扩展将 JSON 中的 category 提取为独立列。</p>
+<p>同一个模块还可以生成问题摘要、提取产品名称或补充候选标签。需要检索知识、调用工具才能完成的分析，可以选择智能体调用，并配置相应智能体与提示词。生成的标注先供筛选和人工复核使用；正式质量评分交给可校准、可比较的评估器，便于长期维护标准。</p>
+<p>题库还缺少某类表达时，可以用 LLM 调用做数据增强：以已有样本为种子，通过提示词生成不同说法或边界条件。例如已经有直接申请退款的题目，希望补充“用户先问到账时间、随后改为申请退款”的多轮要求，就把需要保留的业务事实和允许变化的部分写清楚。生成结果先放入候选材料，人工确认后再使用，同时保留合成来源，方便与真实用户任务区分。</p>
+<p>处理顺序可以按成本安排：已有字段能筛选的先筛选，明确只需 100 条的先采样，再做模型处理。如果采样依赖模型生成的类别，就先分类再按类别抽样。每增加一步，都应说明它要帮使用者少做什么工作、增加哪项信息。</p>
+<h2 id="205">20.5 从一次整理变成日常质检<a class="headerlink" href="#205" title="Permanent link">&para;</a></h2>
+<p>当昨天的样本已经可用，就可以使用相同的处理定义另建周期任务：重新选择相应模板，沿用已确认的字段、筛选和采样设置。在“任务信息与调度策略”选择“周期执行”，设置起始时间和每隔多少小时或天执行，例如按小时补充新任务，或按天集中交付。这次创建一个日常使用的数据集 refund_review_daily，之后各次周期执行都向它写入，质检人员便能在固定位置查看新增内容。</p>
+<p>首次配置时，把历史补数范围与后续周期的起始时间衔接好。之后主要在任务详情中查看执行历史、成功与失败情况，再抽查新增样本。应用增加了新渠道或新的回复方式，也要更新相应处理规则，让数据集包含这些变化。</p>
+<p>接下来进入评估功能，新建以 Dataset 为来源的评估任务，选择 refund_review_samples 和准备好的退款质检评估器，将评估器需要的输入、输出、轨迹变量分别映射到 input、output、agent_trajectory。先评一批样本，查看分数、理由和对应证据，便能找到“工具失败却回复成功”等待处理案例。开始日常质检后，再以 refund_review_daily 中的新样本作为评估材料。</p>
+<p>业务负责人可以看到问题集中在哪些场景，开发者拿着对应轨迹定位并修改，评估人员把确认的问题加入回归材料。新版本重新执行这些任务后，实验再比较结果，判断修改是否有效。新增运行记录继续进入同样的加工任务，日常数据准备就接上了调优工作。</p>
+<p>操作演示中，两道客服问题起初共用评分细项，后来发现“介绍有哪些功能”和“说明如何做评估”需要不同标准，于是回到 Dataset 增加逐题 Rubric，再调整评估与实验的映射。这也说明，产出的字段应便于继续扩充。后续使用提出了新问题，就补充相应材料，而不必重做全部数据准备。</p>
+<h2 id="206">20.6 第一次使用，先交付一批有人愿意用的数据<a class="headerlink" href="#206" title="Permanent link">&para;</a></h2>
+<p>先完成“轨迹提取→Dataset→一批评估”，让负责质检的人读一遍结果。字段对了，再增加标签和采样；已有稳定使用节奏，再建立周期生产任务。</p>
+<p>长期使用时，保留三项简单约定：样本粒度、关键字段含义、数据用途。业务负责人确定要看什么问题，应用开发者维护来源字段，数据处理任务负责重复执行。复杂的并行聚合、超长任务或跨窗补取，再由开发者按实际数据补充处理。</p>
+<p>判断是否值得继续投入，也可以看具体工作有没有变得顺畅：质检人员是否还需要逐条找原日志，新增一种业务场景能否通过补充字段和规则纳入，开发者收到问题后能否定位到同一次执行。若这些环节已经衔接起来，再增加语义聚类、合成或复杂 Agent 分析才有明确目的。管线简单而输出被持续使用，通常比配置了很多处理却无人消费更有价值。</p>
+<p>退款质检的首次交付可以很明确：在 refund_review_samples 中找到昨天的任务，打开一行能读懂问题、回答和办理过程，启动评估能得到有依据的结论。哪些记录值得长期保留、如何经过人工确认成为黄金集与回归集，接着在下一章中展开。</p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  回到页面顶部
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.tabs", "navigation.top", "search.suggest", "search.highlight", "content.code.copy"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "\u5df2\u590d\u5236", "clipboard.copy": "\u590d\u5236", "search.result.more.one": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.more.other": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 # \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.none": "\u6ca1\u6709\u627e\u5230\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.one": "\u627e\u5230 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.other": "# \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.placeholder": "\u952e\u5165\u4ee5\u5f00\u59cb\u641c\u7d22", "search.result.term.missing": "\u7f3a\u5c11", "select.version": "\u9009\u62e9\u5f53\u524d\u7248\u672c"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.d7400e89.min.js"></script>
+      
+    
+  </body>
+</html>

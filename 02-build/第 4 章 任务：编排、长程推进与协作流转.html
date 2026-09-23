@@ -1,0 +1,3826 @@
+
+<!doctype html>
+<html lang="zh" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="阿里云 AI Agent 手白皮书 — 架构 · 构建 · 运行 · 治理 · 调优 · 实践">
+      
+      
+      
+      
+        <link rel="prev" href="%E7%AC%AC%203%20%E7%AB%A0%20%E8%8C%83%E5%BC%8F%EF%BC%9AHarness%20%E7%9A%84%E4%B8%BB%E6%B5%81%E6%9E%84%E5%BB%BA%E6%96%B9%E5%BC%8F%E5%92%8C%E8%B4%A3%E4%BB%BB%E8%BE%B9%E7%95%8C.html">
+      
+      
+        <link rel="next" href="%E7%AC%AC%205%20%E7%AB%A0%20%E4%BF%A1%E6%81%AF%EF%BC%9A%E4%B8%8A%E4%B8%8B%E6%96%87%E3%80%81%E7%8A%B6%E6%80%81%E4%B8%8E%E5%8F%AF%E5%A4%8D%E7%94%A8%E8%83%BD%E5%8A%9B%E8%B5%84%E4%BA%A7.html">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+    
+    
+      
+        <title>第 4 章 任务：编排、长程推进与协作流转 - AI Agent 手白皮书</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.ec1eaa64.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#4" class="md-skip">
+          跳转至
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="页眉">
+    <a href="../index.html" title="AI Agent 手白皮书" class="md-header__button md-logo" aria-label="AI Agent 手白皮书" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            AI Agent 手白皮书
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              第 4 章　任务：编排、长程推进与协作流转
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="切换到深色模式"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="切换到深色模式" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m17.75 4.09-2.53 1.94.91 3.06-2.63-1.81-2.63 1.81.91-3.06-2.53-1.94L12.44 4l1.06-3 1.06 3zm3.5 6.91-1.64 1.25.59 1.98-1.7-1.17-1.7 1.17.59-1.98L15.75 11l2.06-.05L18.5 9l.69 1.95zm-2.28 4.95c.83-.08 1.72 1.1 1.19 1.85-.32.45-.66.87-1.08 1.27C15.17 23 8.84 23 4.94 19.07c-3.91-3.9-3.91-10.24 0-14.14.4-.4.82-.76 1.27-1.08.75-.53 1.93.36 1.85 1.19-.27 2.86.69 5.83 2.89 8.02a9.96 9.96 0 0 0 8.02 2.89m-1.64 2.02a12.08 12.08 0 0 1-7.8-3.47c-2.17-2.19-3.33-5-3.49-7.82-2.81 3.14-2.7 7.96.31 10.98 3.02 3.01 7.84 3.12 10.98.31"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="切换到浅色模式"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="切换到浅色模式" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3m0-7 2.39 3.42C13.65 5.15 12.84 5 12 5s-1.65.15-2.39.42zM3.34 7l4.16-.35A7.2 7.2 0 0 0 5.94 8.5c-.44.74-.69 1.5-.83 2.29zm.02 10 1.76-3.77a7.131 7.131 0 0 0 2.38 4.14zM20.65 7l-1.77 3.79a7.02 7.02 0 0 0-2.38-4.15zm-.01 10-4.14.36c.59-.51 1.12-1.14 1.54-1.86.42-.73.69-1.5.83-2.29zM12 22l-2.41-3.44c.74.27 1.55.44 2.41.44.82 0 1.63-.17 2.37-.44z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="搜索" placeholder="搜索" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="查找">
+        
+        <button type="reset" class="md-search__icon md-icon" title="清空当前内容" aria-label="清空当前内容" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            正在初始化搜索引擎
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="标签" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../index.html" class="md-tabs__link">
+        
+  
+  
+    
+  
+  首页
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../2026-agent-survey-report.html" class="md-tabs__link">
+        
+  
+  
+    
+  
+  调研报告
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../00-preface/00-preface.html" class="md-tabs__link">
+        
+  
+  
+    
+  
+  前言
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../01-architecture/index.html" class="md-tabs__link">
+          
+  
+  
+  架构篇
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="index.html" class="md-tabs__link">
+          
+  
+  
+  构建篇
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../03-run/index.html" class="md-tabs__link">
+          
+  
+  
+  运行篇
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../04-governance/%E6%B2%BB%E7%90%86%E7%AF%87%E5%AF%BC%E8%AF%BB.html" class="md-tabs__link">
+          
+  
+  
+  治理篇
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../05-optimization/%E8%B0%83%E4%BC%98%E7%AF%87%E5%AF%BC%E8%AF%BB.html" class="md-tabs__link">
+          
+  
+  
+  调优篇
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../06-case-study/index.html" class="md-tabs__link">
+          
+  
+  
+  实践篇
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../07-conclusion/%E7%AC%AC%2030%20%E7%AB%A0%20%E4%BB%8E%20Agentic%20Application%20%E5%88%B0%20Agentic%20OS.html" class="md-tabs__link">
+          
+  
+  
+  总结与展望篇
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="导航栏" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../index.html" title="AI Agent 手白皮书" class="md-nav__button md-logo" aria-label="AI Agent 手白皮书" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    AI Agent 手白皮书
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    首页
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../2026-agent-survey-report.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    调研报告
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../00-preface/00-preface.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    前言
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    架构篇
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    架构篇
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../01-architecture/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    架构篇导读
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../01-architecture/%E7%AC%AC%201%20%E7%AB%A0%E3%80%80AI%20%E5%8E%9F%E7%94%9F%E5%BA%94%E7%94%A8%E7%9A%84%E6%96%B0%E9%98%B6%E6%AE%B5.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第 1 章　AI 原生应用的新阶段
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../01-architecture/%E7%AC%AC%202%20%E7%AB%A0%E3%80%80Agentic%20Application%20%E5%8F%82%E8%80%83%E6%9E%B6%E6%9E%84.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第 2 章　Agentic Application 参考架构
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    构建篇
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    构建篇
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    构建篇导读
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="%E7%AC%AC%203%20%E7%AB%A0%20%E8%8C%83%E5%BC%8F%EF%BC%9AHarness%20%E7%9A%84%E4%B8%BB%E6%B5%81%E6%9E%84%E5%BB%BA%E6%96%B9%E5%BC%8F%E5%92%8C%E8%B4%A3%E4%BB%BB%E8%BE%B9%E7%95%8C.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第 3 章　范式：Harness 的主流构建方式和责任边界
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第 4 章　任务：编排、长程推进与协作流转
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="%E7%AC%AC%204%20%E7%AB%A0%20%E4%BB%BB%E5%8A%A1%EF%BC%9A%E7%BC%96%E6%8E%92%E3%80%81%E9%95%BF%E7%A8%8B%E6%8E%A8%E8%BF%9B%E4%B8%8E%E5%8D%8F%E4%BD%9C%E6%B5%81%E8%BD%AC.html" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第 4 章　任务：编排、长程推进与协作流转
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="目录">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      目录
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#41-agent-loop" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.1 Agent Loop 与任务状态机
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="4.1 Agent Loop 与任务状态机">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#411" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.1.1 从模型调用到任务循环
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#412" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.1.2 用权威状态驱动任务
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#413" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.1.3 案例：一次修复任务如何推进
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#42-planningtodo" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.2 Planning、Todo 与阶段目标
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="4.2 Planning、Todo 与阶段目标">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#421" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.2.1 把计划变成外部控制对象
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#422" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.2.2 用阶段门禁约束执行
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#423" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.2.3 将探索、计划和执行分开
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#43-subagent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.3 Subagent 与任务委派
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="4.3 Subagent 与任务委派">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#431" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.3.1 何时值得委派
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#432" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.3.2 建立清晰的委派契约
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#433" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.3.3 案例：分析、修改和评审如何协同
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#434" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.3.4 合并结果与传播失败
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#44" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.4 异步任务与长程续行
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="4.4 异步任务与长程续行">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#441" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.4.1 让任务脱离当前连接持续存在
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#442-harness" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.4.2 将成熟 Harness 嵌入企业服务
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#443" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.4.3 由平台承载长任务
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#45-middleware" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.5 Middleware 与执行内核测试
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="4.5 Middleware 与执行内核测试">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#451-loop" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.5.1 保持核心 Loop 稳定
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#452" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.5.2 对确定性部分做契约测试
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#46" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.6 可靠性与完成验证
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="4.6 可靠性与完成验证">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#461" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.6.1 针对失败类型选择恢复策略
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#462" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.6.2 让完成由证据决定
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#463" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.6.3 案例：什么才算漏洞修复完成
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#464" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.6.4 加速观测、评估基建，并完成智能体验证
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#47" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.7 本章小结
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="%E7%AC%AC%205%20%E7%AB%A0%20%E4%BF%A1%E6%81%AF%EF%BC%9A%E4%B8%8A%E4%B8%8B%E6%96%87%E3%80%81%E7%8A%B6%E6%80%81%E4%B8%8E%E5%8F%AF%E5%A4%8D%E7%94%A8%E8%83%BD%E5%8A%9B%E8%B5%84%E4%BA%A7.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第 5 章　信息：上下文、状态与可复用能力资产
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="%E7%AC%AC%206%20%E7%AB%A0%20%E8%A1%8C%E5%8A%A8%EF%BC%9A%E5%8F%97%E6%8E%A7%E6%89%A7%E8%A1%8C%E3%80%81%E9%AA%8C%E8%AF%81%E5%8F%8D%E9%A6%88%E4%B8%8E%E4%BA%A4%E4%BB%98%E5%87%86%E5%A4%87.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第 6 章　行动：受控执行、验证反馈与交付准备
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    运行篇
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    运行篇
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../03-run/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    运行篇导读
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../03-run/%E7%AC%AC%207%20%E7%AB%A0%20%20Agent%20%E8%BF%90%E8%A1%8C%E6%97%B6%E4%B8%8E%E6%B2%99%E7%AE%B1.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第 7 章　Agent 运行时与沙箱
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../03-run/%E7%AC%AC%208%20%E7%AB%A0%20Agent%20%E7%8A%B6%E6%80%81%E5%AD%98%E5%82%A8%E4%B8%8E%E8%AF%AD%E4%B9%89%E8%B5%84%E4%BA%A7.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第 8 章　Agent 状态存储与语义资产
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../03-run/%E7%AC%AC%209%20%E7%AB%A0%20%20AI%20%E7%BD%91%E5%85%B3%E4%B8%8E%E7%BB%9F%E4%B8%80%E6%B5%81%E9%87%8F%E6%B2%BB%E7%90%86.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第 9 章　AI 网关与统一流量治理
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../03-run/%E7%AC%AC%2010%20%E7%AB%A0%20%20Agent%20%E5%BC%82%E6%AD%A5%E4%BB%BB%E5%8A%A1%E4%B8%8E%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%81%E7%A8%8B.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第 10 章　Agent 异步任务与自动化流程
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../03-run/%E7%AC%AC%2011%E7%AB%A0%20%20Multi-Agent%20%E5%8D%8F%E4%BD%9C%E4%B8%8E%E7%BC%96%E6%8E%92.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第 11 章　Multi-Agent 协作与编排
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../03-run/%E7%AC%AC%2012%20%E7%AB%A0%20Agent%20%E5%88%86%E5%B8%83%E5%BC%8F%E9%80%9A%E4%BF%A1.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第 12 章　Agent 分布式通信
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7" >
+        
+          
+          <label class="md-nav__link" for="__nav_7" id="__nav_7_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    治理篇
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    治理篇
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../04-governance/%E6%B2%BB%E7%90%86%E7%AF%87%E5%AF%BC%E8%AF%BB.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    治理篇导读
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../04-governance/%E7%AC%AC%2013%20%E7%AB%A0%E3%80%80Agent%20%E7%9A%84%E5%8F%AF%E8%A7%82%E6%B5%8B%E6%80%A7.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第 13 章　Agent 的可观测性
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../04-governance/%E7%AC%AC%2014%20%E7%AB%A0%E3%80%80Agent%20%E5%AE%89%E5%85%A8.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第 14 章　Agent 安全
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../04-governance/%E7%AC%AC%2015%20%E7%AB%A0%E3%80%80AI%20%E8%B5%84%E4%BA%A7%E7%9A%84%E5%8F%91%E7%8E%B0%E4%B8%8E%E7%AE%A1%E7%90%86%20.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第 15 章　AI 资产的发现与管理
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../04-governance/%E7%AC%AC%2016%20%E7%AB%A0%E3%80%80Agent%20%E8%A1%8C%E4%B8%BA%E7%94%9F%E6%88%90%E4%B8%8E%E8%B4%A8%E9%87%8F%E9%AA%8C%E8%AF%81.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第 16 章　Agent 行为生成与质量验证
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_8" >
+        
+          
+          <label class="md-nav__link" for="__nav_8" id="__nav_8_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    调优篇
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_8_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_8">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    调优篇
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../05-optimization/%E8%B0%83%E4%BC%98%E7%AF%87%E5%AF%BC%E8%AF%BB.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    调优篇导读
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../05-optimization/%E7%AC%AC%2017%20%E7%AB%A0%E3%80%80%E6%A8%A1%E5%9E%8B%E8%B0%83%E4%BC%98.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第 17 章　模型调优
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../05-optimization/%E7%AC%AC%2018%20%E7%AB%A0%E3%80%80Agent%20%E8%B0%83%E4%BC%98%E6%80%BB%E8%A7%88.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第 18 章　Agent 调优总览
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../05-optimization/%E7%AC%AC%2019%20%E7%AB%A0%E3%80%80Agent%20%E8%BD%A8%E8%BF%B9%E6%95%B0%E6%8D%AE.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第 19 章　Agent 轨迹数据
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../05-optimization/%E7%AC%AC%2020%20%E7%AB%A0%E3%80%80Agent%20%E8%BF%90%E8%A1%8C%E6%97%B6%E6%95%B0%E6%8D%AE%E5%A4%84%E7%90%86.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第 20 章　Agent 运行时数据处理
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../05-optimization/%E7%AC%AC%2021%20%E7%AB%A0%E3%80%80Agent%20%E9%BB%84%E9%87%91%E6%95%B0%E6%8D%AE%E9%9B%86.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第 21 章　Agent 黄金数据集
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../05-optimization/%E7%AC%AC%2022%20%E7%AB%A0%E3%80%80Agent%20%E4%BC%98%E5%8C%96%EF%BC%9ABadcase%20.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第 22 章　Agent 优化：Badcase
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../05-optimization/%E7%AC%AC%2023%20%E7%AB%A0%E3%80%80%E5%8F%97%E6%8E%A7%E8%87%AA%E8%BF%9B%E5%8C%96.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第 23 章　受控自进化
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../05-optimization/%E7%AC%AC%2024%20%E7%AB%A0%E3%80%80Agent%20%E8%BE%B9%E7%BC%98%E8%BF%90%E8%A1%8C%E6%97%B6%E4%B8%8E%E5%85%A8%E7%90%83%E4%BC%98%E5%8C%96.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第 24 章　Agent 边缘运行时与全球优化
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_9" >
+        
+          
+          <label class="md-nav__link" for="__nav_9" id="__nav_9_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    实践篇
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_9_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_9">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    实践篇
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../06-case-study/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    实践篇导读
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_9_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_9_2" id="__nav_9_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第 25 章　研发效能
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_9_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_9_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    第 25 章　研发效能
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../06-case-study/%E7%AC%AC25%E7%AB%A0%20%E7%A0%94%E5%8F%91%E6%95%88%E8%83%BD/ABACI%20%E5%86%85%E6%A0%B8%E8%A1%A5%E4%B8%81%E5%AE%9A%E5%90%91%E6%B5%8B%E8%AF%95%E4%B8%8E%E7%BC%BA%E9%99%B7%E6%A3%80%E6%B5%8B%E6%99%BA%E8%83%BD%E4%BD%93%20.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ABACI 内核补丁定向测试与缺陷检测智能体
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../06-case-study/%E7%AC%AC25%E7%AB%A0%20%E7%A0%94%E5%8F%91%E6%95%88%E8%83%BD/Kitta%EF%BC%9A%E9%A2%86%E5%9F%9F%E4%B8%93%E7%94%A8%20Code%20Review%20Agent.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Kitta：领域专用 Code Review Agent
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../06-case-study/%E7%AC%AC25%E7%AB%A0%20%E7%A0%94%E5%8F%91%E6%95%88%E8%83%BD/PatchPilot%20Agents%EF%BC%9A%E8%AE%A9%E5%86%85%E6%A0%B8%E8%A1%A5%E4%B8%81%E4%BA%A4%E4%BB%98%E6%88%90%E4%B8%BA%E5%8F%AF%E7%BC%96%E6%8E%92%E3%80%81%E5%8F%AF%E9%AA%8C%E8%AF%81%E7%9A%84%E5%B7%A5%E7%A8%8B%E9%97%AD%E7%8E%AF.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    PatchPilot Agents：让内核补丁交付成为可编排、可验证的工程闭环
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../06-case-study/%E7%AC%AC25%E7%AB%A0%20%E7%A0%94%E5%8F%91%E6%95%88%E8%83%BD/%E4%BB%8E%E6%8A%A5%E8%AD%A6%E5%88%B0%E8%87%AA%E5%8A%A8%E4%BF%AE%E5%A4%8D%EF%BC%8CPolarDB-X%20%E7%9A%84%20Loop%20%E5%B7%A5%E7%A8%8B%E5%AE%9E%E8%B7%B5.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    从报警到自动修复，PolarDB-X 的 Loop 工程实践
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../06-case-study/%E7%AC%AC25%E7%AB%A0%20%E7%A0%94%E5%8F%91%E6%95%88%E8%83%BD/%E4%BB%8E%E7%BC%96%E7%A0%81%E6%8F%90%E6%95%88%E5%88%B0%E7%AB%AF%E5%88%B0%E7%AB%AF%E4%BA%A4%E4%BB%98%EF%BC%8C%E4%BA%91%E9%80%9A%E4%BF%A1%E7%9A%84%E4%BA%BA%E6%9C%BA%E5%8D%8F%E4%BD%9C%E5%AE%9E%E8%B7%B5.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    从编码提效到端到端交付，云通信的人机协作实践
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../06-case-study/%E7%AC%AC25%E7%AB%A0%20%E7%A0%94%E5%8F%91%E6%95%88%E8%83%BD/%E4%BB%8E%E8%AF%84%E6%B5%8B%E9%A9%B1%E5%8A%A8%E5%88%B0%E7%AB%AF%E5%88%B0%E7%AB%AF%E4%BA%A4%E4%BB%98%EF%BC%9AAI%20Agent%20%E5%AE%89%E5%85%A8%E4%BA%A7%E5%93%81%E7%A0%94%E5%8F%91%E6%8F%90%E6%95%88%E5%AE%9E%E8%B7%B5.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    从评测驱动到端到端交付：AI Agent 安全产品研发提效实践
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../06-case-study/%E7%AC%AC25%E7%AB%A0%20%E7%A0%94%E5%8F%91%E6%95%88%E8%83%BD/%E5%A4%9A%20Agent%20%E7%BB%84%E6%88%90%E7%A0%94%E5%8F%91%E5%B0%8F%E9%98%9F%EF%BC%9AAI%20%E7%A0%94%E5%8F%91%E5%A6%82%E4%BD%95%E4%BB%8E%E5%86%99%E4%BB%A3%E7%A0%81%E8%B5%B0%E5%90%91%E7%AB%AF%E5%88%B0%E7%AB%AF%E4%BA%A4%E4%BB%98.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    多 Agent 组成研发小队：AI 研发如何从写代码走向端到端交付
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_9_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_9_3" id="__nav_9_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第 26 章　设计工程
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_9_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_9_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    第 26 章　设计工程
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../06-case-study/%E7%AC%AC26%E7%AB%A0%20%E8%AE%BE%E8%AE%A1%E5%B7%A5%E7%A8%8B/GenUI%EF%BC%9A%E8%AE%A9%20Agent%20%E4%BB%8E%E7%BB%99%E5%87%BA%E7%AD%94%E6%A1%88%E8%B5%B0%E5%90%91%E4%BA%A4%E4%BB%98%E7%BB%93%E6%9E%9C.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    GenUI：让 Agent 从给出答案走向交付结果
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../06-case-study/%E7%AC%AC26%E7%AB%A0%20%E8%AE%BE%E8%AE%A1%E5%B7%A5%E7%A8%8B/Vibe%20Designing%EF%BC%9A%E6%84%8F%E5%9B%BE%E9%A9%B1%E5%8A%A8%E7%9A%84AI%E8%AE%BE%E8%AE%A1%E8%8C%83%E5%BC%8F%E8%BF%9B%E5%8C%96.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Vibe Designing：意图驱动的 AI 设计范式进化
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_9_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_9_4" id="__nav_9_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第 27 章　运维、安全与企业 IT
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_9_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_9_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    第 27 章　运维、安全与企业 IT
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../06-case-study/%E7%AC%AC27%E7%AB%A0%20%E8%BF%90%E7%BB%B4%E3%80%81%E5%AE%89%E5%85%A8%E4%B8%8E%E4%BC%81%E4%B8%9AIT/%E5%90%89%E5%88%A9%E6%B1%BD%E8%BD%A6%E6%99%BA%E8%83%BD%E8%BF%90%E7%BB%B4%E7%9A%84%E8%90%BD%E5%9C%B0%E5%AE%9E%E8%B7%B5.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    吉利汽车智能运维的落地实践
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../06-case-study/%E7%AC%AC27%E7%AB%A0%20%E8%BF%90%E7%BB%B4%E3%80%81%E5%AE%89%E5%85%A8%E4%B8%8E%E4%BC%81%E4%B8%9AIT/%E5%A1%94%E6%96%AF%E6%B1%80%E4%B8%87%E5%BA%97%E8%BF%9E%E9%94%81%E7%9A%84%E6%99%BA%E8%83%BD%E8%BF%90%E7%BB%B4%E9%97%AD%E7%8E%AF%E5%AE%9E.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    塔斯汀万店连锁的智能运维闭环实践
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../06-case-study/%E7%AC%AC27%E7%AB%A0%20%E8%BF%90%E7%BB%B4%E3%80%81%E5%AE%89%E5%85%A8%E4%B8%8E%E4%BC%81%E4%B8%9AIT/%E7%95%85%E6%8D%B7%E9%80%9A%E7%9A%84%E5%8F%AF%E8%A7%82%E6%B5%8B%E4%B8%8E%E6%99%BA%E8%83%BD%E8%BF%90%E7%BB%B4%E5%AE%9E%E8%B7%B5.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    畅捷通的可观测与智能运维实践
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_9_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_9_5" id="__nav_9_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第 28 章　客户、销售与运营
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_9_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_9_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    第 28 章　客户、销售与运营
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../06-case-study/%E7%AC%AC28%E7%AB%A0%20%E5%AE%A2%E6%88%B7%E3%80%81%E9%94%80%E5%94%AE%E4%B8%8E%E8%BF%90%E8%90%A5/MiniMax%20%E6%9E%84%E5%BB%BA%E6%B5%B7%E9%87%8F%E9%95%BF%E5%91%A8%E6%9C%9F%E8%AE%B0%E5%BF%86%E6%95%B0%E6%8D%AE%E5%BA%95%E5%BA%A7%E7%9A%84%E5%AE%9E%E8%B7%B5.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    MiniMax 构建海量长周期记忆数据底座的实践
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../06-case-study/%E7%AC%AC28%E7%AB%A0%20%E5%AE%A2%E6%88%B7%E3%80%81%E9%94%80%E5%94%AE%E4%B8%8E%E8%BF%90%E8%90%A5/%E4%BC%9A%E8%AE%A1%E5%B8%88%E4%BA%8B%E5%8A%A1%E6%89%80%E4%BF%A1%E6%B0%B8%E4%B8%AD%E5%92%8C%E7%9A%84%E5%8A%9E%E5%85%AC%E6%8F%90%E6%95%88%E6%8E%A2%E7%B4%A2.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    会计师事务所信永中和的办公提效探索
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../06-case-study/%E7%AC%AC28%E7%AB%A0%20%E5%AE%A2%E6%88%B7%E3%80%81%E9%94%80%E5%94%AE%E4%B8%8E%E8%BF%90%E8%90%A5/%E5%93%94%E5%93%A9%E5%93%94%E5%93%A9%E6%9E%84%E5%BB%BA%E5%85%A8%E5%9F%9F%E5%86%85%E5%AE%B9%E6%B4%9E%E5%AF%9F%E7%9A%84%E5%AE%9E%E8%B7%B5.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    哔哩哔哩构建全域内容洞察的实践
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../06-case-study/%E7%AC%AC28%E7%AB%A0%20%E5%AE%A2%E6%88%B7%E3%80%81%E9%94%80%E5%94%AE%E4%B8%8E%E8%BF%90%E8%90%A5/%E8%BF%90%E8%90%A5%E5%88%86%E6%9E%90%20Data%20Agent%20%E5%AE%9E%E8%B7%B5.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    运营分析 Data Agent 实践
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../06-case-study/%E7%AC%AC%2029%20%E7%AB%A0%20%20GOAI%20Agent%20Infra%20%E8%B5%9B%E9%81%93%EF%BC%9A%E5%A4%9A%20Agent%20%E5%8D%8F%E5%90%8C%E7%9A%84%E5%89%8D%E6%B2%BF%E5%AE%9E%E8%B7%B5%E6%8E%A2%E7%B4%A2.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第 29 章　GOAI Agent Infra 赛道：多 Agent 协同的前沿实践探索
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_10" >
+        
+          
+          <label class="md-nav__link" for="__nav_10" id="__nav_10_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    总结与展望篇
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_10_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_10">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    总结与展望篇
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../07-conclusion/%E7%AC%AC%2030%20%E7%AB%A0%20%E4%BB%8E%20Agentic%20Application%20%E5%88%B0%20Agentic%20OS.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第 30 章　从 Agentic Application 到 Agentic OS
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="目录">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      目录
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#41-agent-loop" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.1 Agent Loop 与任务状态机
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="4.1 Agent Loop 与任务状态机">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#411" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.1.1 从模型调用到任务循环
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#412" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.1.2 用权威状态驱动任务
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#413" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.1.3 案例：一次修复任务如何推进
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#42-planningtodo" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.2 Planning、Todo 与阶段目标
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="4.2 Planning、Todo 与阶段目标">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#421" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.2.1 把计划变成外部控制对象
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#422" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.2.2 用阶段门禁约束执行
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#423" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.2.3 将探索、计划和执行分开
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#43-subagent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.3 Subagent 与任务委派
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="4.3 Subagent 与任务委派">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#431" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.3.1 何时值得委派
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#432" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.3.2 建立清晰的委派契约
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#433" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.3.3 案例：分析、修改和评审如何协同
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#434" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.3.4 合并结果与传播失败
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#44" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.4 异步任务与长程续行
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="4.4 异步任务与长程续行">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#441" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.4.1 让任务脱离当前连接持续存在
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#442-harness" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.4.2 将成熟 Harness 嵌入企业服务
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#443" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.4.3 由平台承载长任务
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#45-middleware" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.5 Middleware 与执行内核测试
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="4.5 Middleware 与执行内核测试">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#451-loop" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.5.1 保持核心 Loop 稳定
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#452" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.5.2 对确定性部分做契约测试
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#46" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.6 可靠性与完成验证
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="4.6 可靠性与完成验证">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#461" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.6.1 针对失败类型选择恢复策略
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#462" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.6.2 让完成由证据决定
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#463" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.6.3 案例：什么才算漏洞修复完成
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#464" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.6.4 加速观测、评估基建，并完成智能体验证
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#47" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.7 本章小结
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="4">第 4 章 任务：编排、长程推进与协作流转<a class="headerlink" href="#4" title="Permanent link">&para;</a></h1>
+<p>上一章讨论了企业构建 Agent 的不同入口，包括基于高代码 Agent Framework 自主构建 Harness、复用产品化的 Harness、使用 Managed Agents 服务托管交付 Agent、在云产品的预置能力之上，快速构建 Agent。本章沿着“构建入口”继续向下，关注一个更具体的问题：当任务不能通过一次模型调用完成时，Harness 如何把模型的离散判断组织为可持续推进、可中断恢复、可验证结束的任务过程。</p>
+<p>模型的一次输出只是离散判断，而要解决一个企业级任务通常是一个持续的过程。它可能需要先理解环境、再制定计划，连续调用多个工具，在关键动作前等待审批，把部分工作委派给子代理，经历失败和恢复，最后还要用环境事实证明目标已经达成。Harness 执行内核的职责，就是把模型的每一次判断组织成有状态、可控制、可恢复的任务过程。</p>
+<p>本章聚焦 Harness 的执行与编排系统：Agent Loop 如何推进任务，Planning 和 Todo 如何把目标外部化，Subagent 如何形成受控委派，异步任务如何跨越请求、进程和上下文窗口，以及如何判断 Agent 是真正完成，而不是仅仅停止。Context、Memory 与 Workspace 的信息组织将在第 5 章展开；工具、Sandbox、权限、Streaming、Trace 与 Evaluation 则在第 6 章主讲。</p>
+<p>本章使用同一个企业案例贯穿全章，这个案例既包含长程执行，也包含并行委派、异步等待、人工介入和确定性验证，能够代表大量企业工程任务。</p>
+<blockquote>
+<p><strong>生产服务漏洞修复与变更发布 Agent</strong>：收到支付服务高危依赖漏洞任务后，Agent 需要定位受影响代码和运行实例，制定升级方案，将依赖分析、代码修改和独立评审分配给不同执行者，在隔离环境中修改代码并运行测试，生成变更单；涉及发布时等待责任人审批，最后以代码差异、测试报告、安全扫描和发布状态验证任务是否完成。</p>
+</blockquote>
+<hr />
+<h2 id="41-agent-loop">4.1 Agent Loop 与任务状态机<a class="headerlink" href="#41-agent-loop" title="Permanent link">&para;</a></h2>
+<h3 id="411">4.1.1 从模型调用到任务循环<a class="headerlink" href="#411" title="Permanent link">&para;</a></h3>
+<p>Agent Loop 是 Harness 最稳定的内核。它不要求模型一次性给出完整答案，而是允许模型根据当前目标和环境反馈，重复执行“判断—行动—观察—再判断”，直到任务被验证完成、进入等待、失败或取消。</p>
+<p>一个最小但完整的 Loop 可以抽象为五个阶段：</p>
+<div class="highlight"><pre><span></span><code>stateDiagram-v2
+    [*] --&gt; Prepare
+    Prepare: Prepare
+    Prepare: 装配当前任务视图与可用能力
+    Prepare --&gt; Model
+    Model: Model
+    Model: 判断下一步意图
+    Model --&gt; Act: 请求行动
+    Act: Act
+    Act: 校验并执行工具或委派
+    Act --&gt; Observe
+    Observe: Observe
+    Observe: 标准化结果并更新任务事实
+    Observe --&gt; Prepare: 继续推进
+    Model --&gt; Verify: 申请阶段或任务完成
+    Verify: Verify
+    Verify: 用环境事实或规则验收
+    Verify --&gt; Prepare: 未通过，产生新缺口
+    Verify --&gt; Completed: 通过
+    Model --&gt; Waiting: 等待输入、审批或外部事件
+    Waiting --&gt; Prepare: 条件满足后恢复
+    Prepare --&gt; Failed: 不可恢复错误或预算耗尽
+    Completed --&gt; [*]
+    Failed --&gt; [*]
+</code></pre></div>
+<ul>
+<li>
+<p><strong>Prepare</strong> 读取权威任务状态，确定本轮目标，并向第 5 章的 Context Builder 请求模型输入。</p>
+</li>
+<li>
+<p><strong>Model</strong> 调用模型，由模型判断下一步应行动、委派、询问、等待还是申请完成。</p>
+</li>
+<li>
+<p><strong>Act</strong> 将模型意图交给第 6 章的 Action Plane，完成参数、身份、策略、审批和执行。</p>
+</li>
+<li>
+<p><strong>Observe</strong> 将工具、环境、子任务或用户反馈转换为结构化 Observation，并更新任务事实。</p>
+</li>
+<li>
+<p><strong>Verify</strong> 不接受“我已经完成”作为唯一依据，而是运行与任务相匹配的验收器。</p>
+</li>
+</ul>
+<p>浏览文件、执行代码、查询业务系统和调度远程 Agent，都是 Act 的不同实现；用户追加要求、工具返回和异步任务完成，都是 Observe 的不同来源。核心 Loop 保持稳定，具体能力通过扩展点加入。</p>
+<h3 id="412">4.1.2 用权威状态驱动任务<a class="headerlink" href="#412" title="Permanent link">&para;</a></h3>
+<p>消息历史记录了模型和用户曾经交换的内容，却不应成为任务状态的唯一来源。企业 Harness 至少要维护一份可机读的权威状态：目标、当前阶段、Plan 与 Todo、已确认事实、阻塞项、子任务、Artifact、剩余预算、等待原因和完成依据。</p>
+<table>
+<thead>
+<tr>
+<th>状态</th>
+<th>语义</th>
+<th>允许的下一步</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>CREATED</code></td>
+<td>任务已经建立但尚未开始</td>
+<td>进入运行或取消</td>
+</tr>
+<tr>
+<td><code>RUNNING</code></td>
+<td>正在准备、推理或行动</td>
+<td>继续、暂停、等待、验证、失败或取消</td>
+</tr>
+<tr>
+<td><code>WAITING_INPUT</code></td>
+<td>缺少用户或业务信息</td>
+<td>接收输入后恢复，或超时结束</td>
+</tr>
+<tr>
+<td><code>WAITING_APPROVAL</code></td>
+<td>行动明确但需要批准</td>
+<td>批准、拒绝、修改或取消</td>
+</tr>
+<tr>
+<td><code>WAITING_EVENT</code></td>
+<td>等待工具、子任务或外部系统</td>
+<td>收到事件后恢复，或按策略超时</td>
+</tr>
+<tr>
+<td><code>PAUSED</code></td>
+<td>用户或系统主动暂停</td>
+<td>恢复、修改规则或取消</td>
+</tr>
+<tr>
+<td><code>VERIFYING</code></td>
+<td>正在核验阶段或最终结果</td>
+<td>通过、生成修复项或失败</td>
+</tr>
+<tr>
+<td><code>COMPLETED</code></td>
+<td>验收条件已经满足</td>
+<td>交付结果与证据</td>
+</tr>
+<tr>
+<td><code>FAILED</code></td>
+<td>当前策略下不能继续</td>
+<td>重开尝试、转人工或结束</td>
+</tr>
+<tr>
+<td><code>CANCELLED</code></td>
+<td>任务被显式终止</td>
+<td>清理资源并保留审计事实</td>
+</tr>
+</tbody>
+</table>
+<p><code>WAITING</code> 不是失败，<code>PAUSED</code> 也不是结束。只有把这些状态显式化，上层 Runtime 才能在等待期间释放计算资源并准确恢复；交互界面才能说明 Agent 在等什么；观测系统才能区分执行慢、审批慢和工具慢。</p>
+<p>Loop 还必须有外部终止边界。步骤数、总时长、Token 与费用、工具调用次数、子任务并发数、高风险动作次数都应进入预算。预算接近阈值时，Harness 可以要求模型收敛范围、停止新委派、优先完成可交付部分或请求用户选择；预算耗尽时，则应产生明确终态与未完成清单，而不是悄然截断。</p>
+<h3 id="413">4.1.3 案例：一次修复任务如何推进<a class="headerlink" href="#413" title="Permanent link">&para;</a></h3>
+<p>漏洞修复任务进入系统后，不应只生成一串聊天消息，而应形成持续更新的任务对象。例如在完成影响分析后，权威状态可以表示为：</p>
+<div class="highlight"><pre><span></span><code><span class="nt">task_id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">remediation-2026-0917</span>
+<span class="nt">goal</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">修复 payment-service 中 CVE-XXXX 并形成可审批变更</span>
+<span class="nt">state</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">RUNNING</span>
+<span class="nt">stage</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">implement_fix</span>
+<span class="nt">facts</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">affected_module</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">payment-core</span>
+<span class="w">  </span><span class="nt">current_version</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">4.2.1</span>
+<span class="w">  </span><span class="nt">target_version</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">4.2.4</span>
+<span class="nt">todos</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nt">id</span><span class="p">:</span><span class="w"> </span><span class="nv">t1</span><span class="p p-Indicator">,</span><span class="nt"> title</span><span class="p">:</span><span class="w"> </span><span class="nv">确认影响范围</span><span class="p p-Indicator">,</span><span class="nt"> status</span><span class="p">:</span><span class="w"> </span><span class="nv">completed</span><span class="p p-Indicator">}</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nt">id</span><span class="p">:</span><span class="w"> </span><span class="nv">t2</span><span class="p p-Indicator">,</span><span class="nt"> title</span><span class="p">:</span><span class="w"> </span><span class="nv">修改依赖并补充测试</span><span class="p p-Indicator">,</span><span class="nt"> status</span><span class="p">:</span><span class="w"> </span><span class="nv">in_progress</span><span class="p p-Indicator">}</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nt">id</span><span class="p">:</span><span class="w"> </span><span class="nv">t3</span><span class="p p-Indicator">,</span><span class="nt"> title</span><span class="p">:</span><span class="w"> </span><span class="nv">独立评审变更</span><span class="p p-Indicator">,</span><span class="nt"> status</span><span class="p">:</span><span class="w"> </span><span class="nv">pending</span><span class="p p-Indicator">}</span>
+<span class="nt">artifacts</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">impact-report.md</span>
+<span class="nt">budgets</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">remaining_steps</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">36</span>
+<span class="w">  </span><span class="nt">remaining_minutes</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">48</span>
+
+<span class="nt">completion_evidence</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="w"> </span><span class="p p-Indicator">]</span>
+</code></pre></div>
+<p>模型看到的是由这份状态生成的当前任务视图，而不是被迫从几百条历史消息中猜测进度。当安全扫描还未通过时，即使模型输出“修复已完成”，状态也只能进入 <code>VERIFYING</code>；只有验收器补齐证据，才能提交 <code>COMPLETED</code>。</p>
+<hr />
+<h2 id="42-planningtodo">4.2 Planning、Todo 与阶段目标<a class="headerlink" href="#42-planningtodo" title="Permanent link">&para;</a></h2>
+<h3 id="421">4.2.1 把计划变成外部控制对象<a class="headerlink" href="#421" title="Permanent link">&para;</a></h3>
+<p>Planning 的价值不是展示模型隐藏的思考过程，而是把任务结构外部化为 Harness 和用户都能读取、修改和验证的控制对象：要达到什么阶段目标、有哪些依赖、哪一步正在执行、用什么证据判定完成。</p>
+<p>根据任务复杂度，Harness 可以使用三种控制方式：</p>
+<table>
+<thead>
+<tr>
+<th>模式</th>
+<th>表示方式</th>
+<th>适用任务</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>轻量 Todo</td>
+<td>简短、有序的待办列表</td>
+<td>目标明确、步骤少、反馈快</td>
+</tr>
+<tr>
+<td>Plan Mode</td>
+<td>只读探索、形成计划、确认后执行</td>
+<td>影响面较大、需要审阅、环境尚不清楚</td>
+</tr>
+<tr>
+<td>Planner–Executor</td>
+<td>Planner 维护阶段和依赖，Executor 逐项执行</td>
+<td>长任务、多依赖、可并行或需要专业角色</td>
+</tr>
+</tbody>
+</table>
+<p>计划必须允许修订。工具结果可能推翻假设，用户可能改变目标，环境也可能暴露新约束。每次重规划都应说明触发事实并保留已完成项，不能通过改写目标掩盖失败。Todo 则不需要记录每次微小工具调用，只记录会改变任务可交付状态的事项，并保持唯一的当前进行项或明确的并行分组。</p>
+<h3 id="422">4.2.2 用阶段门禁约束执行<a class="headerlink" href="#422" title="Permanent link">&para;</a></h3>
+<p>长任务不应直到最后才验证。漏洞修复案例可以划分为五个阶段：</p>
+<table>
+<thead>
+<tr>
+<th>阶段</th>
+<th>主要产物</th>
+<th>进入下一阶段的门禁</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>影响分析</td>
+<td>受影响模块、依赖链、运行实例清单</td>
+<td>影响范围可追溯，版本事实已核验</td>
+</tr>
+<tr>
+<td>修复规划</td>
+<td>升级方案、兼容风险、回滚方案</td>
+<td>计划获批准，写操作权限被放开</td>
+</tr>
+<tr>
+<td>变更实施</td>
+<td>代码差异、依赖锁文件、测试补充</td>
+<td>修改仅发生在授权工作区</td>
+</tr>
+<tr>
+<td>独立验证</td>
+<td>单测、集成测试、安全扫描、评审意见</td>
+<td>所有强制检查通过或缺口被显式接受</td>
+</tr>
+<tr>
+<td>发布准备</td>
+<td>变更单、发布窗口、回滚入口</td>
+<td>责任人审批；本章不自动执行生产发布</td>
+</tr>
+</tbody>
+</table>
+<p>阶段门禁既降低错误方向上的继续投入，也为 Context 压缩、人工接管和跨窗口续行提供稳定边界。有效的阶段描述必须回答“输出是什么、证据在哪里、谁来确认”，而不是只写“分析问题”“处理代码”“确保质量”。</p>
+<h3 id="423">4.2.3 将探索、计划和执行分开<a class="headerlink" href="#423" title="Permanent link">&para;</a></h3>
+<p>在 Framework 路径中，应用团队可以直接把计划能力组合进 Harness。下面的 AgentScope 示例为修复 Agent 启用 Plan Mode 与任务列表：</p>
+<div class="highlight"><pre><span></span><code><span class="n">HarnessAgent</span><span class="w"> </span><span class="n">agent</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">HarnessAgent</span><span class="p">.</span><span class="na">builder</span><span class="p">()</span>
+<span class="w">    </span><span class="p">.</span><span class="na">name</span><span class="p">(</span><span class="s">"remediation-agent"</span><span class="p">)</span>
+<span class="w">    </span><span class="p">.</span><span class="na">model</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
+<span class="w">    </span><span class="p">.</span><span class="na">workspace</span><span class="p">(</span><span class="n">workspace</span><span class="p">)</span>
+<span class="w">    </span><span class="p">.</span><span class="na">enablePlanMode</span><span class="p">()</span>
+<span class="w">    </span><span class="p">.</span><span class="na">planFileDirectory</span><span class="p">(</span><span class="s">"plans"</span><span class="p">)</span>
+<span class="w">    </span><span class="p">.</span><span class="na">enableTaskList</span><span class="p">()</span>
+<span class="w">    </span><span class="p">.</span><span class="na">build</span><span class="p">();</span>
+</code></pre></div>
+<p>Plan Mode 将执行过程分为“只读探索—写入计划—人工确认—进入执行”。探索阶段只开放只读工具以及 <code>plan_enter</code>、<code>plan_write</code>、<code>plan_exit</code>、<code>todo_write</code> 等计划工具；<code>plan_exit</code> 触发人工确认，获批后才进入可修改工作区的阶段。计划写入 <code>plans/PLAN.md</code>，Todo 保存在 Agent 状态中，因此两者都能跨调用恢复。</p>
+<p>这一实现展示了 Prompt 与 Harness 控制的区别：Prompt 可以要求模型“先规划再修改”，但只有权限模式、工具白名单、持久状态与 HITL 共同生效，系统才真正具备“计划获批前不可写”的约束。</p>
+<hr />
+<h2 id="43-subagent">4.3 Subagent 与任务委派<a class="headerlink" href="#43-subagent" title="Permanent link">&para;</a></h2>
+<h3 id="431">4.3.1 何时值得委派<a class="headerlink" href="#431" title="Permanent link">&para;</a></h3>
+<p>Subagent 的价值不是把一个 Agent 包装成多个角色，而是解决三个具体问题：</p>
+<ol>
+<li>
+<p><strong>上下文隔离</strong>：子任务只加载相关文件、工具和历史，避免主 Agent 的窗口被探索过程占满。</p>
+</li>
+<li>
+<p><strong>能力隔离</strong>：不同子任务使用不同模型、指令、Skill、工具与权限。</p>
+</li>
+<li>
+<p><strong>并行执行</strong>：互不依赖的检索、实现或验证可以同时推进，缩短墙钟时间。</p>
+</li>
+</ol>
+<p>任务很短、步骤高度依赖或共享对象频繁变化时，委派会增加通信和合并成本。只有隔离、专业化或并行收益超过这些成本时，Subagent 才有价值。</p>
+<h3 id="432">4.3.2 建立清晰的委派契约<a class="headerlink" href="#432" title="Permanent link">&para;</a></h3>
+<p>主 Agent 负责全局目标、计划、预算、依赖和最终结果，不应把“任务完成”的责任一并交出去。研究 Subagent 收集事实与候选方案，执行 Subagent 在限定范围内产生变更，评审 Subagent 使用相对独立的上下文寻找缺口。这些是运行时职责，不一定是永久角色。</p>
+<p>每个子任务都应携带可机读契约：</p>
+<table>
+<thead>
+<tr>
+<th>契约项</th>
+<th>需要回答的问题</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>目标与边界</td>
+<td>交付什么；哪些目录、系统和动作在范围内</td>
+</tr>
+<tr>
+<td>已知上下文</td>
+<td>哪些事实已确认；哪些决定不可自行改变</td>
+</tr>
+<tr>
+<td>能力与权限</td>
+<td>可用模型、Skill、Tool、环境和权限是什么</td>
+</tr>
+<tr>
+<td>预算</td>
+<td>最大时间、步骤、Token、费用和并发是多少</td>
+</tr>
+<tr>
+<td>输出与证据</td>
+<td>结果采用何种结构，证据和来源如何附带</td>
+</tr>
+<tr>
+<td>失败语义</td>
+<td>何时重试、返回部分结果、升级或终止</td>
+</tr>
+<tr>
+<td>验收条件</td>
+<td>父 Agent 用什么条件判断结果可采用</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Delegation</strong> 是父任务保留责任，将有边界的子任务委派出去；结果返回后仍由父 Agent 整合和验收。<strong>Handoff</strong> 则是任务控制权发生转移，接收者成为当前责任人，并获得继续推进所需的目标、状态和恢复位置。二者都不能只通过一条自然语言消息实现；至少要有任务关系、状态与责任变更记录。</p>
+<h3 id="433">4.3.3 案例：分析、修改和评审如何协同<a class="headerlink" href="#433" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code>flowchart TB
+    P[主 Agent&lt;br/&gt;维护计划、预算与最终责任]
+    P --&gt;|只读、并行| R[依赖分析 Subagent&lt;br/&gt;输出影响报告]
+    P --&gt;|隔离分支、可写| I[修复 Subagent&lt;br/&gt;输出代码补丁与测试]
+    R --&gt; P
+    I --&gt; P
+    P --&gt;|基于固定差异、只读| V[评审 Subagent&lt;br/&gt;输出缺陷与验证意见]
+    V --&gt; P
+    P --&gt; G[整合证据并申请阶段通过]
+</code></pre></div>
+<p>分析与代码库探索可以并行，但代码修改需要基于已确认目标版本；评审必须读取固定的差异和测试结果，而不能与执行者共享未经提交的中间判断。多个执行者若同时修改同一工作区，应使用隔离分支、对象级锁或补丁合并，不能依赖“大家小心不要冲突”。</p>
+<p>AgentScope 支持把子代理声明为工作区中的版本化规格。例如：</p>
+<div class="highlight"><pre><span></span><code>---
+description: 对漏洞修复补丁进行独立评审，检查兼容性、测试和回滚风险。
+workspace:
+  mode: isolated
+steps: 8
+<span class="gu">tools: [read_file, grep_files]</span>
+<span class="gu">---</span>
+
+只审查已生成的差异和测试证据，不修改代码。
+按“阻断问题、一般问题、证据缺口”输出结构化结果。
+</code></pre></div>
+<p>主 Agent 可通过 <code>agent_spawn</code> 同步调用，也可以设置后台执行并获得 <code>task_id</code>。子代理默认不应继承父任务的全部上下文和权限；父任务有权委派，并不意味着子 Agent 自动获得同等授权。</p>
+<h3 id="434">4.3.4 合并结果与传播失败<a class="headerlink" href="#434" title="Permanent link">&para;</a></h3>
+<p>父任务需要显式定义子任务失败策略：关键分析失败时 <code>FAIL_FAST</code>；非关键探索可以 <code>BEST_EFFORT</code>；瞬时故障可以 <code>RETRY_OR_REASSIGN</code>；需要业务决定时进入 <code>ESCALATE</code>。合并结果时还要校验输入版本和证据时间，避免采用基于旧代码或旧业务状态得出的结论。</p>
+<p>Subagent 的产物不是主 Agent 可以直接复述的“答案”，而是新的 Observation。只有经过 Schema 校验、版本检查和父任务验收后，才能进入权威任务状态。</p>
+<hr />
+<h2 id="44">4.4 异步任务与长程续行<a class="headerlink" href="#44" title="Permanent link">&para;</a></h2>
+<h3 id="441">4.4.1 让任务脱离当前连接持续存在<a class="headerlink" href="#441" title="Permanent link">&para;</a></h3>
+<p>企业任务经常超过一次 HTTP 请求、一个终端进程或一个模型上下文的生命周期。Harness 必须把任务身份与当前连接分离：调用方提交任务后获得稳定 <code>task_id</code>，可以持续消费事件，也可以断开；任务进入等待或后台运行时，Runtime 可以释放当前计算资源；条件满足后，从权威状态恢复，而不是依赖原进程仍然存在。</p>
+<div class="highlight"><pre><span></span><code>sequenceDiagram
+    participant C as Client / Channel
+    participant H as Harness
+    participant R as Runtime
+    participant X as Tool / Subagent
+
+    C-&gt;&gt;H: 创建修复任务
+    H--&gt;&gt;C: task_id + event cursor
+    H-&gt;&gt;X: 启动安全扫描或后台评审
+    H-&gt;&gt;R: WAITING_EVENT + continuation
+    Note over H,R: 当前执行资源可以释放
+    X--&gt;&gt;R: 完成事件
+    R-&gt;&gt;H: 恢复 continuation
+    H-&gt;&gt;H: 从权威状态重建 Context
+    H--&gt;&gt;C: 进度、Artifact 与完成证据
+</code></pre></div>
+<p>后台任务、事件和恢复应共用一套契约：稳定任务 ID、父任务 ID、当前状态、创建者与执行者、输入和 Artifact 引用、事件序号、超时、取消与幂等语义、结果位置、错误分类，以及恢复所需的 Continuation。</p>
+<p>暂停前，Harness 应停止创建新行动，处理可中断操作并保存最新状态；恢复时重新检查目标、外部条件、工具是否实际执行、权限是否仍有效、工作区是否变化以及剩余预算。取消需要沿父子任务传播，但已发生的外部副作用不能假装消失，必须保留事实并在必要时执行补偿。</p>
+<p>Context Reset 只负责控制语义：在旧窗口结束前形成一致的继续点，在新窗口中从权威状态重建当前任务视图。Continuation 应包含目标、当前 Plan、已确认事实、失败尝试、Artifact、等待项、剩余预算和权限模式。其具体存储、压缩和装配方式将在第 5 章展开。</p>
+<h3 id="442-harness">4.4.2 将成熟 Harness 嵌入企业服务<a class="headerlink" href="#442-harness" title="Permanent link">&para;</a></h3>
+<p>Coding Agent SDK 适合希望复用成熟执行内核、同时保留业务服务入口的企业。下面的 TypeScript 示例通过 Qoder Agent SDK 提交漏洞修复任务，限制可用工具，并消费模型消息、工具调用与最终结果：</p>
+<div class="highlight"><pre><span></span><code><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">accessTokenFromEnv</span><span class="p">,</span><span class="w"> </span><span class="nx">query</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">'@qoder-ai/qoder-agent-sdk'</span><span class="p">;</span>
+
+<span class="k">for</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="p">(</span><span class="kd">const</span><span class="w"> </span><span class="nx">message</span><span class="w"> </span><span class="k">of</span><span class="w"> </span><span class="nx">query</span><span class="p">({</span>
+<span class="w">  </span><span class="nx">prompt</span><span class="o">:</span><span class="w"> </span><span class="s1">'分析 payment-service 的高危依赖漏洞，修改代码并补充测试；不要发布。'</span><span class="p">,</span>
+<span class="w">  </span><span class="nx">options</span><span class="o">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nx">auth</span><span class="o">:</span><span class="w"> </span><span class="kt">accessTokenFromEnv</span><span class="p">(),</span>
+<span class="w">    </span><span class="nx">cwd</span><span class="o">:</span><span class="w"> </span><span class="s1">'/workspace/payment-service'</span><span class="p">,</span>
+<span class="w">    </span><span class="nx">allowedTools</span><span class="o">:</span><span class="w"> </span><span class="p">[</span><span class="s1">'Read'</span><span class="p">,</span><span class="w"> </span><span class="s1">'Write'</span><span class="p">,</span><span class="w"> </span><span class="s1">'Edit'</span><span class="p">,</span><span class="w"> </span><span class="s1">'Glob'</span><span class="p">,</span><span class="w"> </span><span class="s1">'Grep'</span><span class="p">,</span><span class="w"> </span><span class="s1">'Bash'</span><span class="p">],</span>
+<span class="w">    </span><span class="nx">permissionMode</span><span class="o">:</span><span class="w"> </span><span class="s1">'acceptEdits'</span><span class="p">,</span>
+<span class="w">  </span><span class="p">},</span>
+<span class="p">}))</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">message</span><span class="p">.</span><span class="kr">type</span><span class="w"> </span><span class="o">===</span><span class="w"> </span><span class="s1">'assistant'</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kd">const</span><span class="w"> </span><span class="nx">block</span><span class="w"> </span><span class="k">of</span><span class="w"> </span><span class="nx">message</span><span class="p">.</span><span class="nx">message</span><span class="p">.</span><span class="nx">content</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">block</span><span class="p">.</span><span class="kr">type</span><span class="w"> </span><span class="o">===</span><span class="w"> </span><span class="s1">'text'</span><span class="p">)</span><span class="w"> </span><span class="nx">publishText</span><span class="p">(</span><span class="nx">block</span><span class="p">.</span><span class="nx">text</span><span class="p">);</span>
+<span class="w">      </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">block</span><span class="p">.</span><span class="kr">type</span><span class="w"> </span><span class="o">===</span><span class="w"> </span><span class="s1">'tool_use'</span><span class="p">)</span><span class="w"> </span><span class="nx">publishToolEvent</span><span class="p">(</span><span class="nx">block</span><span class="p">.</span><span class="nx">name</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">message</span><span class="p">.</span><span class="kr">type</span><span class="w"> </span><span class="o">===</span><span class="w"> </span><span class="s1">'result'</span><span class="p">)</span><span class="w"> </span><span class="nx">persistOutcome</span><span class="p">(</span><span class="nx">message</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>SDK 在应用进程中提供调用与事件接口，底层 CLI Runtime 负责计划、模型调用和工具执行。企业服务仍需在外围补齐租户身份、任务队列、Session 索引、Artifact 存储、权限策略和业务验收，不能把一个本地 SDK 进程直接等同于分布式在线服务。</p>
+<p>在多实例或弹性环境中，Session 应保存到共享存储。调用方记录首次运行返回的 <code>session_id</code>，后续请求通过 <code>resume</code> 恢复；任意实例都可以读取同一 Session，而不是依赖最初的容器。外部 Session Store 解决的是会话接续，任务队列、并发控制和业务幂等仍需要企业服务层负责。</p>
+<div class="highlight"><pre><span></span><code>flowchart LR
+    U[企业入口&lt;br/&gt;API / 工作台 / IM] --&gt; G[租户网关与任务服务]
+    G --&gt; Q[任务队列]
+    Q --&gt; W1[Qoder SDK Worker]
+    Q --&gt; W2[Qoder SDK Worker]
+    W1 &lt;--&gt; S[(共享 Session Store)]
+    W2 &lt;--&gt; S
+    W1 --&gt; E[隔离工作区与企业工具]
+    W2 --&gt; E
+    W1 --&gt; O[(Event / Artifact / Trace)]
+    W2 --&gt; O
+</code></pre></div>
+<h3 id="443">4.4.3 由平台承载长任务<a class="headerlink" href="#443" title="Permanent link">&para;</a></h3>
+<p>如果企业不希望自行维护 Agent Loop、Session 接续和执行基础，可以选择 Qoder Cloud Agents。Qoder Cloud Agents 以 Agent、Environment、Session、Event 为核心对象：Agent 固化模型与行为，Environment 定义代码和运行条件，Session 承载一次持续任务，Event 负责输入与流式输出。应用侧保存业务任务与 Session 的映射，并消费状态、工具和结果事件。</p>
+<p>这一路径降低了执行内核的建设成本，但业务责任不会消失。企业仍要定义工具与数据边界、任务目标、审批人、成功标准和最终验收。第 6 章将用同一案例展示托管 Session 的事件流、审批与 Sandbox 连接。</p>
+<hr />
+<h2 id="45-middleware">4.5 Middleware 与执行内核测试<a class="headerlink" href="#45-middleware" title="Permanent link">&para;</a></h2>
+<h3 id="451-loop">4.5.1 保持核心 Loop 稳定<a class="headerlink" href="#451-loop" title="Permanent link">&para;</a></h3>
+<p>一个常见演进问题是：每加入压缩、计划、权限、模型路由或观测能力，就在 Loop 中增加一组条件分支。短期直接，长期会使状态迁移不可预测。更稳健的结构是“稳定内核 + 可插拔能力”：核心 Loop 只定义阶段与状态迁移；Middleware、Hook 或 Ability 在明确的生命周期点读取 Runtime Context，返回放行、修改、短路或追加行为。</p>
+<table>
+<thead>
+<tr>
+<th>扩展时机</th>
+<th>可加入的能力</th>
+<th>不应做的事</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Task 创建前后</td>
+<td>任务分类、初始预算、版本绑定</td>
+<td>隐式改变用户目标</td>
+</tr>
+<tr>
+<td>Prepare 前后</td>
+<td>计划提醒、Context 请求、模型路由</td>
+<td>把持久状态只写进 Prompt</td>
+</tr>
+<tr>
+<td>Model 调用前后</td>
+<td>参数策略、输出解析、无进展检测</td>
+<td>记录不应保留的敏感推理内容</td>
+</tr>
+<tr>
+<td>Action 前后</td>
+<td>预算检查、结果标准化</td>
+<td>绕过第 6 章统一 Action Plane</td>
+</tr>
+<tr>
+<td>State 变化前后</td>
+<td>状态校验、Checkpoint、通知</td>
+<td>多处各自维护权威状态</td>
+</tr>
+<tr>
+<td>Verify 前后</td>
+<td>选择验收器、生成缺口、质量门禁</td>
+<td>仅凭模型自述标记完成</td>
+</tr>
+</tbody>
+</table>
+<p>扩展本身也需要顺序、读写范围、冲突规则、失败语义和可观测性。最好让扩展返回结构化 Decision 或 Patch，由核心 Loop 统一提交，而不是任意修改共享对象。</p>
+<p>AgentScope 的 HarnessAgent 采用能力组合方式，将工作区、状态存储、计划、Subagent、Memory、压缩、Skill、Sandbox 与 Channel 叠加到统一运行上下文中。Framework 路径因此具有最大的业务调优空间，也意味着应用团队要为能力组合、生命周期顺序和最终效果负责。</p>
+<h3 id="452">4.5.2 对确定性部分做契约测试<a class="headerlink" href="#452" title="Permanent link">&para;</a></h3>
+<p>Harness 测试不能只看最终回答。执行内核至少需要四类确定性测试：</p>
+<ul>
+<li>
+<p><strong>状态迁移测试</strong>：每个状态只接受合法事件，暂停、取消和失败正确传播。</p>
+</li>
+<li>
+<p><strong>扩展顺序测试</strong>：Middleware 在确定时机运行，冲突与短路行为稳定。</p>
+</li>
+<li>
+<p><strong>恢复测试</strong>：在任意安全点中断后，任务能够重建且不重复副作用。</p>
+</li>
+<li>
+<p><strong>预算与边界测试</strong>：达到步骤、时间、费用和风险阈值后，Loop 按设计收敛。</p>
+</li>
+</ul>
+<p>例如，修复 Agent 的恢复测试可以在“补丁已写入但测试结果尚未返回”时强制中断：恢复后应先查询原测试任务，而不是再次修改文件或重复启动发布。模型输出可通过固定样本、录制回放或模拟器替代，以验证 Harness 的确定性控制；真实模型的端到端效果进入第 6 章的 Evaluation。</p>
+<hr />
+<h2 id="46">4.6 可靠性与完成验证<a class="headerlink" href="#46" title="Permanent link">&para;</a></h2>
+<h3 id="461">4.6.1 针对失败类型选择恢复策略<a class="headerlink" href="#461" title="Permanent link">&para;</a></h3>
+<p>“Agent 失败”不是一个可执行的诊断。瞬时模型或网络错误适合有界退避；参数错误需要修正；环境缺失需要重建；权限拒绝应等待或终止；重复探索需要重新规划；业务条件不满足则要明确缺口。盲目重试只会增加成本和风险。</p>
+<p>有副作用的行动在重试前必须先回答“上一次究竟有没有发生”。对于发布、通知、写数据库等操作，超时可能只是响应丢失。Harness 应生成幂等键，记录请求与结果，并优先查询状态；无法证明未执行时，不应直接重复。切换模型、工具或环境的降级路径也要被记录，因为能力、权限和结果质量可能已经变化。</p>
+<p>无进展检测比单纯的最大步数更早发现问题。常见信号包括：连续调用相同工具且参数高度相似、反复得到同一错误、Plan 长时间不变、工作区没有新增事实、模型在少数行动间循环。检测后可以先要求模型根据结构化证据重新规划，再逐步采取缩小任务、切换能力、创建独立评审或转人工。</p>
+<h3 id="462">4.6.2 让完成由证据决定<a class="headerlink" href="#462" title="Permanent link">&para;</a></h3>
+<p>模型只能提出完成申请，Harness 才能提交完成状态。验证强度应与风险匹配：</p>
+<table>
+<thead>
+<tr>
+<th>层级</th>
+<th>验证方式</th>
+<th>适用结果</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>结构验证</td>
+<td>Schema、必填字段、格式和文件存在</td>
+<td>低风险结构化产物</td>
+</tr>
+<tr>
+<td>环境验证</td>
+<td>查询真实系统、检查文件差异与执行结果</td>
+<td>工具和工作区任务</td>
+</tr>
+<tr>
+<td>确定性验证</td>
+<td>测试、规则、静态检查和业务校验</td>
+<td>可编码成功条件</td>
+</tr>
+<tr>
+<td>独立模型验证</td>
+<td>使用独立 Context 检查质量与遗漏</td>
+<td>开放式分析和复杂内容</td>
+</tr>
+<tr>
+<td>人工验收</td>
+<td>责任人审阅、签署或批准</td>
+<td>高影响、主观或合规任务</td>
+</tr>
+</tbody>
+</table>
+<p>Verifier 应返回结构化缺口、失败证据和可修复性。验证失败不是简单结束，而是新的 Observation：Harness 决定继续修复、重新规划、转交还是失败。Verifier 是单次任务的完成门禁；跨版本判断某个 Harness 是否更好，则属于第 6 章的 Evaluation Harness。</p>
+<h3 id="463">4.6.3 案例：什么才算漏洞修复完成<a class="headerlink" href="#463" title="Permanent link">&para;</a></h3>
+<p>对贯穿案例而言，以下事实必须同时成立：</p>
+<ol>
+<li>
+<p>依赖清单证明受影响版本已经被替换，且没有通过传递依赖重新引入。</p>
+</li>
+<li>
+<p>代码差异仅落在授权目录，变更与已批准计划一致。</p>
+</li>
+<li>
+<p>单元测试、集成测试和安全扫描均有可寻址报告，强制项全部通过。</p>
+</li>
+<li>
+<p>独立评审没有未关闭的阻断问题。</p>
+</li>
+<li>
+<p>变更单包含影响范围、回滚方案和证据引用。</p>
+</li>
+<li>
+<p>如果目标只到“形成可审批变更”，系统不得把“尚未发布”误判为未完成；如果目标包含发布，则必须进一步核验审批和真实部署状态。</p>
+</li>
+</ol>
+<p>因此，最终结果不是一句“已完成”，而是一组目标相关的事实：</p>
+<div class="highlight"><pre><span></span><code><span class="nt">state</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">COMPLETED</span>
+<span class="nt">outcome</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">change_ready_for_approval</span>
+<span class="nt">evidence</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">dependency_check</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">artifacts/dependency-tree.json</span>
+<span class="w">  </span><span class="nt">code_diff</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">artifacts/remediation.patch</span>
+<span class="w">  </span><span class="nt">unit_tests</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">artifacts/unit-test.xml</span>
+<span class="w">  </span><span class="nt">integration_tests</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">artifacts/integration-test.xml</span>
+<span class="w">  </span><span class="nt">security_scan</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">artifacts/security-scan.sarif</span>
+<span class="w">  </span><span class="nt">review</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">artifacts/review.json</span>
+<span class="w">  </span><span class="nt">change_request</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">CR-18427</span>
+<span class="nt">remaining_actions</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">由服务负责人审批并安排发布窗口</span>
+</code></pre></div>
+<p>这套结构可以直接迁移到其他场景：合同审查以条款覆盖、来源和责任人签署为证据；数据修复以影响行数、抽样校验和回滚点为证据；客户工单以系统状态、沟通记录和用户确认作为证据。变化的是 Verifier，稳定的是“模型申请完成、Harness 依据事实提交完成”的原则。</p>
+<h3 id="464">4.6.4 加速观测、评估基建，并完成智能体验证<a class="headerlink" href="#464" title="Permanent link">&para;</a></h3>
+<p>Agent 云产品可以为长任务验证提供统一的运行信号，但不应替代业务完成语义。以阿里云 AgentCore 为例，其产品概述支持在统一平台中管理 Agent，连接模型、Skill 与 MCP 工具，并管理访问外部系统所需的凭证。平台还提供运行监控、Trace 与评估能力，并可统一纳管不同来源的 Agent，使企业在同一控制面观察执行过程和质量信号。</p>
+<p>企业接入 AgentCore 时，仍需由业务 Task 管理机制维护 Task 标识、状态版本、幂等键、审批条件和 Artifact 引用，并将 AgentCore 的 Agent 与可观测数据映射到任务契约。获得授权的 Verifier 再联合确定性测试、真实业务系统状态和人工授权判定 Outcome。平台统一纳管多个 Agent，也不意味着这些 Agent 天然共享同一父子任务语义或完成标准。企业可以复用 AgentCore 既有的资源装配、运行观测和评估能力，减少重复建设；业务完成责任仍由企业应用定义和承担。</p>
+<hr />
+<h2 id="47">4.7 本章小结<a class="headerlink" href="#47" title="Permanent link">&para;</a></h2>
+<p>Harness 执行内核把模型的离散判断组织成可靠任务过程。稳定的 Agent Loop 以 Prepare、Model、Act、Observe、Verify 推进任务；显式状态和多维预算提供确定性边界；Planning、Todo 与阶段门禁把任务控制外部化；Subagent 通过上下文、能力和责任隔离实现受控委派；异步任务、Continuation 与共享 Session 让任务跨越连接、进程和上下文窗口；Middleware 则使能力可以在不重写核心 Loop 的前提下组合演进。</p>
+<p>下一章进入 Harness 的信息工程，即上下文、状态与可复用能力资产：如何在有限模型窗口与持续增长的任务事实之间，组织 Context、Session、Workspace、Memory、Knowledge 和 Skill。</p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  回到页面顶部
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.tabs", "navigation.top", "search.suggest", "search.highlight", "content.code.copy"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "\u5df2\u590d\u5236", "clipboard.copy": "\u590d\u5236", "search.result.more.one": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.more.other": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 # \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.none": "\u6ca1\u6709\u627e\u5230\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.one": "\u627e\u5230 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.other": "# \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.placeholder": "\u952e\u5165\u4ee5\u5f00\u59cb\u641c\u7d22", "search.result.term.missing": "\u7f3a\u5c11", "select.version": "\u9009\u62e9\u5f53\u524d\u7248\u672c"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.d7400e89.min.js"></script>
+      
+    
+  </body>
+</html>

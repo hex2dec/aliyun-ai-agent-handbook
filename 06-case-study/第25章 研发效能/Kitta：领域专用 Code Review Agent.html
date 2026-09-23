@@ -1,0 +1,2824 @@
+
+<!doctype html>
+<html lang="zh" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="阿里云 AI Agent 手白皮书 — 架构 · 构建 · 运行 · 治理 · 调优 · 实践">
+      
+      
+      
+      
+        <link rel="prev" href="ABACI%20%E5%86%85%E6%A0%B8%E8%A1%A5%E4%B8%81%E5%AE%9A%E5%90%91%E6%B5%8B%E8%AF%95%E4%B8%8E%E7%BC%BA%E9%99%B7%E6%A3%80%E6%B5%8B%E6%99%BA%E8%83%BD%E4%BD%93%20.html">
+      
+      
+        <link rel="next" href="PatchPilot%20Agents%EF%BC%9A%E8%AE%A9%E5%86%85%E6%A0%B8%E8%A1%A5%E4%B8%81%E4%BA%A4%E4%BB%98%E6%88%90%E4%B8%BA%E5%8F%AF%E7%BC%96%E6%8E%92%E3%80%81%E5%8F%AF%E9%AA%8C%E8%AF%81%E7%9A%84%E5%B7%A5%E7%A8%8B%E9%97%AD%E7%8E%AF.html">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+    
+    
+      
+        <title>Kitta：领域专用 Code Review Agent - AI Agent 手白皮书</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.ec1eaa64.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#kitta-code-review-agent" class="md-skip">
+          跳转至
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="页眉">
+    <a href="../../index.html" title="AI Agent 手白皮书" class="md-header__button md-logo" aria-label="AI Agent 手白皮书" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            AI Agent 手白皮书
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Kitta：领域专用 Code Review Agent
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="切换到深色模式"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="切换到深色模式" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m17.75 4.09-2.53 1.94.91 3.06-2.63-1.81-2.63 1.81.91-3.06-2.53-1.94L12.44 4l1.06-3 1.06 3zm3.5 6.91-1.64 1.25.59 1.98-1.7-1.17-1.7 1.17.59-1.98L15.75 11l2.06-.05L18.5 9l.69 1.95zm-2.28 4.95c.83-.08 1.72 1.1 1.19 1.85-.32.45-.66.87-1.08 1.27C15.17 23 8.84 23 4.94 19.07c-3.91-3.9-3.91-10.24 0-14.14.4-.4.82-.76 1.27-1.08.75-.53 1.93.36 1.85 1.19-.27 2.86.69 5.83 2.89 8.02a9.96 9.96 0 0 0 8.02 2.89m-1.64 2.02a12.08 12.08 0 0 1-7.8-3.47c-2.17-2.19-3.33-5-3.49-7.82-2.81 3.14-2.7 7.96.31 10.98 3.02 3.01 7.84 3.12 10.98.31"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="切换到浅色模式"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="切换到浅色模式" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3m0-7 2.39 3.42C13.65 5.15 12.84 5 12 5s-1.65.15-2.39.42zM3.34 7l4.16-.35A7.2 7.2 0 0 0 5.94 8.5c-.44.74-.69 1.5-.83 2.29zm.02 10 1.76-3.77a7.131 7.131 0 0 0 2.38 4.14zM20.65 7l-1.77 3.79a7.02 7.02 0 0 0-2.38-4.15zm-.01 10-4.14.36c.59-.51 1.12-1.14 1.54-1.86.42-.73.69-1.5.83-2.29zM12 22l-2.41-3.44c.74.27 1.55.44 2.41.44.82 0 1.63-.17 2.37-.44z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="搜索" placeholder="搜索" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="查找">
+        
+        <button type="reset" class="md-search__icon md-icon" title="清空当前内容" aria-label="清空当前内容" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            正在初始化搜索引擎
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="标签" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../index.html" class="md-tabs__link">
+        
+  
+  
+    
+  
+  首页
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../2026-agent-survey-report.html" class="md-tabs__link">
+        
+  
+  
+    
+  
+  调研报告
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../00-preface/00-preface.html" class="md-tabs__link">
+        
+  
+  
+    
+  
+  前言
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../01-architecture/index.html" class="md-tabs__link">
+          
+  
+  
+  架构篇
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../02-build/index.html" class="md-tabs__link">
+          
+  
+  
+  构建篇
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../03-run/index.html" class="md-tabs__link">
+          
+  
+  
+  运行篇
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../04-governance/%E6%B2%BB%E7%90%86%E7%AF%87%E5%AF%BC%E8%AF%BB.html" class="md-tabs__link">
+          
+  
+  
+  治理篇
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../05-optimization/%E8%B0%83%E4%BC%98%E7%AF%87%E5%AF%BC%E8%AF%BB.html" class="md-tabs__link">
+          
+  
+  
+  调优篇
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../index.html" class="md-tabs__link">
+          
+  
+  
+  实践篇
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../07-conclusion/%E7%AC%AC%2030%20%E7%AB%A0%20%E4%BB%8E%20Agentic%20Application%20%E5%88%B0%20Agentic%20OS.html" class="md-tabs__link">
+          
+  
+  
+  总结与展望篇
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="导航栏" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../../index.html" title="AI Agent 手白皮书" class="md-nav__button md-logo" aria-label="AI Agent 手白皮书" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    AI Agent 手白皮书
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    首页
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../2026-agent-survey-report.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    调研报告
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../00-preface/00-preface.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    前言
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    架构篇
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    架构篇
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../01-architecture/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    架构篇导读
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../01-architecture/%E7%AC%AC%201%20%E7%AB%A0%E3%80%80AI%20%E5%8E%9F%E7%94%9F%E5%BA%94%E7%94%A8%E7%9A%84%E6%96%B0%E9%98%B6%E6%AE%B5.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第 1 章　AI 原生应用的新阶段
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../01-architecture/%E7%AC%AC%202%20%E7%AB%A0%E3%80%80Agentic%20Application%20%E5%8F%82%E8%80%83%E6%9E%B6%E6%9E%84.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第 2 章　Agentic Application 参考架构
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    构建篇
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    构建篇
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../02-build/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    构建篇导读
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../02-build/%E7%AC%AC%203%20%E7%AB%A0%20%E8%8C%83%E5%BC%8F%EF%BC%9AHarness%20%E7%9A%84%E4%B8%BB%E6%B5%81%E6%9E%84%E5%BB%BA%E6%96%B9%E5%BC%8F%E5%92%8C%E8%B4%A3%E4%BB%BB%E8%BE%B9%E7%95%8C.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第 3 章　范式：Harness 的主流构建方式和责任边界
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../02-build/%E7%AC%AC%204%20%E7%AB%A0%20%E4%BB%BB%E5%8A%A1%EF%BC%9A%E7%BC%96%E6%8E%92%E3%80%81%E9%95%BF%E7%A8%8B%E6%8E%A8%E8%BF%9B%E4%B8%8E%E5%8D%8F%E4%BD%9C%E6%B5%81%E8%BD%AC.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第 4 章　任务：编排、长程推进与协作流转
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../02-build/%E7%AC%AC%205%20%E7%AB%A0%20%E4%BF%A1%E6%81%AF%EF%BC%9A%E4%B8%8A%E4%B8%8B%E6%96%87%E3%80%81%E7%8A%B6%E6%80%81%E4%B8%8E%E5%8F%AF%E5%A4%8D%E7%94%A8%E8%83%BD%E5%8A%9B%E8%B5%84%E4%BA%A7.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第 5 章　信息：上下文、状态与可复用能力资产
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../02-build/%E7%AC%AC%206%20%E7%AB%A0%20%E8%A1%8C%E5%8A%A8%EF%BC%9A%E5%8F%97%E6%8E%A7%E6%89%A7%E8%A1%8C%E3%80%81%E9%AA%8C%E8%AF%81%E5%8F%8D%E9%A6%88%E4%B8%8E%E4%BA%A4%E4%BB%98%E5%87%86%E5%A4%87.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第 6 章　行动：受控执行、验证反馈与交付准备
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    运行篇
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    运行篇
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../03-run/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    运行篇导读
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../03-run/%E7%AC%AC%207%20%E7%AB%A0%20%20Agent%20%E8%BF%90%E8%A1%8C%E6%97%B6%E4%B8%8E%E6%B2%99%E7%AE%B1.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第 7 章　Agent 运行时与沙箱
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../03-run/%E7%AC%AC%208%20%E7%AB%A0%20Agent%20%E7%8A%B6%E6%80%81%E5%AD%98%E5%82%A8%E4%B8%8E%E8%AF%AD%E4%B9%89%E8%B5%84%E4%BA%A7.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第 8 章　Agent 状态存储与语义资产
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../03-run/%E7%AC%AC%209%20%E7%AB%A0%20%20AI%20%E7%BD%91%E5%85%B3%E4%B8%8E%E7%BB%9F%E4%B8%80%E6%B5%81%E9%87%8F%E6%B2%BB%E7%90%86.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第 9 章　AI 网关与统一流量治理
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../03-run/%E7%AC%AC%2010%20%E7%AB%A0%20%20Agent%20%E5%BC%82%E6%AD%A5%E4%BB%BB%E5%8A%A1%E4%B8%8E%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%81%E7%A8%8B.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第 10 章　Agent 异步任务与自动化流程
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../03-run/%E7%AC%AC%2011%E7%AB%A0%20%20Multi-Agent%20%E5%8D%8F%E4%BD%9C%E4%B8%8E%E7%BC%96%E6%8E%92.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第 11 章　Multi-Agent 协作与编排
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../03-run/%E7%AC%AC%2012%20%E7%AB%A0%20Agent%20%E5%88%86%E5%B8%83%E5%BC%8F%E9%80%9A%E4%BF%A1.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第 12 章　Agent 分布式通信
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7" >
+        
+          
+          <label class="md-nav__link" for="__nav_7" id="__nav_7_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    治理篇
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    治理篇
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../04-governance/%E6%B2%BB%E7%90%86%E7%AF%87%E5%AF%BC%E8%AF%BB.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    治理篇导读
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../04-governance/%E7%AC%AC%2013%20%E7%AB%A0%E3%80%80Agent%20%E7%9A%84%E5%8F%AF%E8%A7%82%E6%B5%8B%E6%80%A7.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第 13 章　Agent 的可观测性
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../04-governance/%E7%AC%AC%2014%20%E7%AB%A0%E3%80%80Agent%20%E5%AE%89%E5%85%A8.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第 14 章　Agent 安全
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../04-governance/%E7%AC%AC%2015%20%E7%AB%A0%E3%80%80AI%20%E8%B5%84%E4%BA%A7%E7%9A%84%E5%8F%91%E7%8E%B0%E4%B8%8E%E7%AE%A1%E7%90%86%20.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第 15 章　AI 资产的发现与管理
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../04-governance/%E7%AC%AC%2016%20%E7%AB%A0%E3%80%80Agent%20%E8%A1%8C%E4%B8%BA%E7%94%9F%E6%88%90%E4%B8%8E%E8%B4%A8%E9%87%8F%E9%AA%8C%E8%AF%81.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第 16 章　Agent 行为生成与质量验证
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_8" >
+        
+          
+          <label class="md-nav__link" for="__nav_8" id="__nav_8_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    调优篇
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_8_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_8">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    调优篇
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../05-optimization/%E8%B0%83%E4%BC%98%E7%AF%87%E5%AF%BC%E8%AF%BB.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    调优篇导读
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../05-optimization/%E7%AC%AC%2017%20%E7%AB%A0%E3%80%80%E6%A8%A1%E5%9E%8B%E8%B0%83%E4%BC%98.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第 17 章　模型调优
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../05-optimization/%E7%AC%AC%2018%20%E7%AB%A0%E3%80%80Agent%20%E8%B0%83%E4%BC%98%E6%80%BB%E8%A7%88.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第 18 章　Agent 调优总览
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../05-optimization/%E7%AC%AC%2019%20%E7%AB%A0%E3%80%80Agent%20%E8%BD%A8%E8%BF%B9%E6%95%B0%E6%8D%AE.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第 19 章　Agent 轨迹数据
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../05-optimization/%E7%AC%AC%2020%20%E7%AB%A0%E3%80%80Agent%20%E8%BF%90%E8%A1%8C%E6%97%B6%E6%95%B0%E6%8D%AE%E5%A4%84%E7%90%86.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第 20 章　Agent 运行时数据处理
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../05-optimization/%E7%AC%AC%2021%20%E7%AB%A0%E3%80%80Agent%20%E9%BB%84%E9%87%91%E6%95%B0%E6%8D%AE%E9%9B%86.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第 21 章　Agent 黄金数据集
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../05-optimization/%E7%AC%AC%2022%20%E7%AB%A0%E3%80%80Agent%20%E4%BC%98%E5%8C%96%EF%BC%9ABadcase%20.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第 22 章　Agent 优化：Badcase
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../05-optimization/%E7%AC%AC%2023%20%E7%AB%A0%E3%80%80%E5%8F%97%E6%8E%A7%E8%87%AA%E8%BF%9B%E5%8C%96.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第 23 章　受控自进化
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../05-optimization/%E7%AC%AC%2024%20%E7%AB%A0%E3%80%80Agent%20%E8%BE%B9%E7%BC%98%E8%BF%90%E8%A1%8C%E6%97%B6%E4%B8%8E%E5%85%A8%E7%90%83%E4%BC%98%E5%8C%96.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第 24 章　Agent 边缘运行时与全球优化
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_9" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_9" id="__nav_9_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    实践篇
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_9_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_9">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    实践篇
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    实践篇导读
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_9_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_9_2" id="__nav_9_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第 25 章　研发效能
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_9_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_9_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    第 25 章　研发效能
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="ABACI%20%E5%86%85%E6%A0%B8%E8%A1%A5%E4%B8%81%E5%AE%9A%E5%90%91%E6%B5%8B%E8%AF%95%E4%B8%8E%E7%BC%BA%E9%99%B7%E6%A3%80%E6%B5%8B%E6%99%BA%E8%83%BD%E4%BD%93%20.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ABACI 内核补丁定向测试与缺陷检测智能体
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+      <a href="Kitta%EF%BC%9A%E9%A2%86%E5%9F%9F%E4%B8%93%E7%94%A8%20Code%20Review%20Agent.html" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Kitta：领域专用 Code Review Agent
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="PatchPilot%20Agents%EF%BC%9A%E8%AE%A9%E5%86%85%E6%A0%B8%E8%A1%A5%E4%B8%81%E4%BA%A4%E4%BB%98%E6%88%90%E4%B8%BA%E5%8F%AF%E7%BC%96%E6%8E%92%E3%80%81%E5%8F%AF%E9%AA%8C%E8%AF%81%E7%9A%84%E5%B7%A5%E7%A8%8B%E9%97%AD%E7%8E%AF.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    PatchPilot Agents：让内核补丁交付成为可编排、可验证的工程闭环
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="%E4%BB%8E%E6%8A%A5%E8%AD%A6%E5%88%B0%E8%87%AA%E5%8A%A8%E4%BF%AE%E5%A4%8D%EF%BC%8CPolarDB-X%20%E7%9A%84%20Loop%20%E5%B7%A5%E7%A8%8B%E5%AE%9E%E8%B7%B5.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    从报警到自动修复，PolarDB-X 的 Loop 工程实践
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="%E4%BB%8E%E7%BC%96%E7%A0%81%E6%8F%90%E6%95%88%E5%88%B0%E7%AB%AF%E5%88%B0%E7%AB%AF%E4%BA%A4%E4%BB%98%EF%BC%8C%E4%BA%91%E9%80%9A%E4%BF%A1%E7%9A%84%E4%BA%BA%E6%9C%BA%E5%8D%8F%E4%BD%9C%E5%AE%9E%E8%B7%B5.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    从编码提效到端到端交付，云通信的人机协作实践
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="%E4%BB%8E%E8%AF%84%E6%B5%8B%E9%A9%B1%E5%8A%A8%E5%88%B0%E7%AB%AF%E5%88%B0%E7%AB%AF%E4%BA%A4%E4%BB%98%EF%BC%9AAI%20Agent%20%E5%AE%89%E5%85%A8%E4%BA%A7%E5%93%81%E7%A0%94%E5%8F%91%E6%8F%90%E6%95%88%E5%AE%9E%E8%B7%B5.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    从评测驱动到端到端交付：AI Agent 安全产品研发提效实践
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="%E5%A4%9A%20Agent%20%E7%BB%84%E6%88%90%E7%A0%94%E5%8F%91%E5%B0%8F%E9%98%9F%EF%BC%9AAI%20%E7%A0%94%E5%8F%91%E5%A6%82%E4%BD%95%E4%BB%8E%E5%86%99%E4%BB%A3%E7%A0%81%E8%B5%B0%E5%90%91%E7%AB%AF%E5%88%B0%E7%AB%AF%E4%BA%A4%E4%BB%98.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    多 Agent 组成研发小队：AI 研发如何从写代码走向端到端交付
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_9_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_9_3" id="__nav_9_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第 26 章　设计工程
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_9_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_9_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    第 26 章　设计工程
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../%E7%AC%AC26%E7%AB%A0%20%E8%AE%BE%E8%AE%A1%E5%B7%A5%E7%A8%8B/GenUI%EF%BC%9A%E8%AE%A9%20Agent%20%E4%BB%8E%E7%BB%99%E5%87%BA%E7%AD%94%E6%A1%88%E8%B5%B0%E5%90%91%E4%BA%A4%E4%BB%98%E7%BB%93%E6%9E%9C.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    GenUI：让 Agent 从给出答案走向交付结果
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../%E7%AC%AC26%E7%AB%A0%20%E8%AE%BE%E8%AE%A1%E5%B7%A5%E7%A8%8B/Vibe%20Designing%EF%BC%9A%E6%84%8F%E5%9B%BE%E9%A9%B1%E5%8A%A8%E7%9A%84AI%E8%AE%BE%E8%AE%A1%E8%8C%83%E5%BC%8F%E8%BF%9B%E5%8C%96.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Vibe Designing：意图驱动的 AI 设计范式进化
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_9_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_9_4" id="__nav_9_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第 27 章　运维、安全与企业 IT
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_9_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_9_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    第 27 章　运维、安全与企业 IT
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../%E7%AC%AC27%E7%AB%A0%20%E8%BF%90%E7%BB%B4%E3%80%81%E5%AE%89%E5%85%A8%E4%B8%8E%E4%BC%81%E4%B8%9AIT/%E5%90%89%E5%88%A9%E6%B1%BD%E8%BD%A6%E6%99%BA%E8%83%BD%E8%BF%90%E7%BB%B4%E7%9A%84%E8%90%BD%E5%9C%B0%E5%AE%9E%E8%B7%B5.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    吉利汽车智能运维的落地实践
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../%E7%AC%AC27%E7%AB%A0%20%E8%BF%90%E7%BB%B4%E3%80%81%E5%AE%89%E5%85%A8%E4%B8%8E%E4%BC%81%E4%B8%9AIT/%E5%A1%94%E6%96%AF%E6%B1%80%E4%B8%87%E5%BA%97%E8%BF%9E%E9%94%81%E7%9A%84%E6%99%BA%E8%83%BD%E8%BF%90%E7%BB%B4%E9%97%AD%E7%8E%AF%E5%AE%9E.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    塔斯汀万店连锁的智能运维闭环实践
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../%E7%AC%AC27%E7%AB%A0%20%E8%BF%90%E7%BB%B4%E3%80%81%E5%AE%89%E5%85%A8%E4%B8%8E%E4%BC%81%E4%B8%9AIT/%E7%95%85%E6%8D%B7%E9%80%9A%E7%9A%84%E5%8F%AF%E8%A7%82%E6%B5%8B%E4%B8%8E%E6%99%BA%E8%83%BD%E8%BF%90%E7%BB%B4%E5%AE%9E%E8%B7%B5.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    畅捷通的可观测与智能运维实践
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_9_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_9_5" id="__nav_9_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第 28 章　客户、销售与运营
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_9_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_9_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    第 28 章　客户、销售与运营
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../%E7%AC%AC28%E7%AB%A0%20%E5%AE%A2%E6%88%B7%E3%80%81%E9%94%80%E5%94%AE%E4%B8%8E%E8%BF%90%E8%90%A5/MiniMax%20%E6%9E%84%E5%BB%BA%E6%B5%B7%E9%87%8F%E9%95%BF%E5%91%A8%E6%9C%9F%E8%AE%B0%E5%BF%86%E6%95%B0%E6%8D%AE%E5%BA%95%E5%BA%A7%E7%9A%84%E5%AE%9E%E8%B7%B5.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    MiniMax 构建海量长周期记忆数据底座的实践
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../%E7%AC%AC28%E7%AB%A0%20%E5%AE%A2%E6%88%B7%E3%80%81%E9%94%80%E5%94%AE%E4%B8%8E%E8%BF%90%E8%90%A5/%E4%BC%9A%E8%AE%A1%E5%B8%88%E4%BA%8B%E5%8A%A1%E6%89%80%E4%BF%A1%E6%B0%B8%E4%B8%AD%E5%92%8C%E7%9A%84%E5%8A%9E%E5%85%AC%E6%8F%90%E6%95%88%E6%8E%A2%E7%B4%A2.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    会计师事务所信永中和的办公提效探索
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../%E7%AC%AC28%E7%AB%A0%20%E5%AE%A2%E6%88%B7%E3%80%81%E9%94%80%E5%94%AE%E4%B8%8E%E8%BF%90%E8%90%A5/%E5%93%94%E5%93%A9%E5%93%94%E5%93%A9%E6%9E%84%E5%BB%BA%E5%85%A8%E5%9F%9F%E5%86%85%E5%AE%B9%E6%B4%9E%E5%AF%9F%E7%9A%84%E5%AE%9E%E8%B7%B5.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    哔哩哔哩构建全域内容洞察的实践
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../%E7%AC%AC28%E7%AB%A0%20%E5%AE%A2%E6%88%B7%E3%80%81%E9%94%80%E5%94%AE%E4%B8%8E%E8%BF%90%E8%90%A5/%E8%BF%90%E8%90%A5%E5%88%86%E6%9E%90%20Data%20Agent%20%E5%AE%9E%E8%B7%B5.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    运营分析 Data Agent 实践
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../%E7%AC%AC%2029%20%E7%AB%A0%20%20GOAI%20Agent%20Infra%20%E8%B5%9B%E9%81%93%EF%BC%9A%E5%A4%9A%20Agent%20%E5%8D%8F%E5%90%8C%E7%9A%84%E5%89%8D%E6%B2%BF%E5%AE%9E%E8%B7%B5%E6%8E%A2%E7%B4%A2.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第 29 章　GOAI Agent Infra 赛道：多 Agent 协同的前沿实践探索
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_10" >
+        
+          
+          <label class="md-nav__link" for="__nav_10" id="__nav_10_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    总结与展望篇
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_10_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_10">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    总结与展望篇
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../07-conclusion/%E7%AC%AC%2030%20%E7%AB%A0%20%E4%BB%8E%20Agentic%20Application%20%E5%88%B0%20Agentic%20OS.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第 30 章　从 Agentic Application 到 Agentic OS
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="目录">
+  
+  
+  
+    
+  
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="kitta-code-review-agent">Kitta：领域专用 Code Review Agent<a class="headerlink" href="#kitta-code-review-agent" title="Permanent link">&para;</a></h1>
+<h1 id="_1">摘要<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h1>
+<p>AI 辅助编程普及后，代码产出呈指数级增长，但审查人力并未同步扩张。内核等基础软件的 PR 体积与评审耗时激增，通用 AI Review 工具因缺乏领域知识与业务理解，难以满足专家级审查需求，研发效能的瓶颈正从“写”快速向“审”转移。</p>
+<p>本白皮书将介绍 Kitta，一套面向领域深度定制的 Code Review Agent。它将通用智能体领域化，通过沉淀项目级专家资产、定制审查流程与领域知识库，并构建在线离线协同进化闭环，精准解决领域特定的代码问题。</p>
+<p>Kitta 在龙蜥社区线上运行至今，累计完成超 7 万个补丁的审查，门禁准确率达 97%，合入率稳定在 62%。其领域定制方法论已在操作系统内核、编译器、云原生平台等六大领域验证，实现 17.0%–31.6% 的审查质量提升，成功将 Maintainer 的精力从逐行审查释放至关键争议裁决。</p>
+<hr />
+<h2 id="_2">背景与现状<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
+<h3 id="11">1.1 代码量暴涨之后，质量压力剧增<a class="headerlink" href="#11" title="Permanent link">&para;</a></h3>
+<p>先看几组数字。</p>
+<p>Linux 内核上游修复 CVE 的数量正在快速攀升：内核 6.9 到 6.19 各版本大致还在四五百的区间，到 7.0 已跳升至约 1250，7.2 更是逼近 1900，预估 7.3 版本时数字将超过 2000。放大到全行业，CVE 同比增长更为夸张——全部 +394%，高危 +811%（数据来源：Linux Foundation《The CRA Readiness Reality: What Changed and What Didn't Between 2025 and 2026》）。这组增长暴露了现状的代码质量压力：代码缺陷暴露的量和危害程度均在持续增加。随之而来地，开源软件项目需要合入的代码量也随之骤增。以龙蜥社区 ANCK 内核仓库为例，两个主流版本的分支合入 PR 在 AI Agent 引入后持续攀升。</p>
+<p><img alt="image.png" src="../../assets/imgs/chapter-25/image-001.png" /></p>
+<p>研发效能侧的数据同样印证这一趋势。DORA（Google Cloud 旗下的研发效能研究项目）发布的年度报告《State of AI-assisted Software Development》显示：AI 深度参与开发的同时，代码 Bug 率 +9%，代码评审时间 +91%，平均 PR 体积 +154%（该版受访者约 5,000 人，数字为相关性口径而非因果结论）。</p>
+<p>综上，在 AI Coding 人机共写的时代之下，编码已不再受人力限制，但审查的人力并没有同步增长。产能的瓶颈，正在从"写"转移到"审"。</p>
+<h3 id="12-agentic-ci">1.2 Agentic CI 中的代码评审意义<a class="headerlink" href="#12-agentic-ci" title="Permanent link">&para;</a></h3>
+<p>面对这个趋势，龙蜥社区在探索 AI Native 研发组织的形态，把持续集成升级为智能化持续集成（Agentic Continuous Integration），整个流水线分为四个环节：</p>
+<ol>
+<li>
+<p>AI 协同编程——研发产能普遍激增，人机共写，编码已不再受人力限制；</p>
+</li>
+<li>
+<p>智能化代码评审——需要检查研发规范与流程、架构与设计一致性、变更完整性与前置依赖、缺陷与安全风险；但人工审查资源不足，AI 评审势在必行；</p>
+</li>
+<li>
+<p>智能化测试——包括深度漏洞挖掘、补丁定向测试、安全补丁验证、回归与性能测试，以及进一步验证测试；</p>
+</li>
+<li>
+<p>社区审核合入——人来做最终的决定。</p>
+</li>
+</ol>
+<p>可以看到，AI 评审处在承上启下的位置：上游的 AI 协同编程把代码产量抬了上去，下游的智能化测试和社区合入又都建立在"进入测试和合入环节的代码是靠谱的"这个前提上。如果评审环节失守，要么缺陷漏到下游，要么 Maintainer 被人机共写产出的 PR 洪流淹没。这就是 Kitta 要解决的问题。</p>
+<h2 id="ai-code-review">AI Code Review 的深层挑战<a class="headerlink" href="#ai-code-review" title="Permanent link">&para;</a></h2>
+<p>AI Code Review 带来了一些显而易见的红利，例如显著提升的响应速度、对基础缺陷问题的自动化拦截等等。然而，通用 AI Review 工具在核心业务里往往达不到专家级可用的审查需求。</p>
+<p>拆开来看，当前通用 Code Review 方案在两个维度上都存在明显局限。一是<strong>工程行为约束不足</strong>：覆盖不全、位置漂移、效果不稳定——变更较大时倾向于只评审部分文件导致遗漏，报告的问题与实际代码位置对不上，评审质量随提示词的细微差异大幅波动。二是<strong>检查深度不足</strong>：缺乏对审查项目的语义理解，规则浮于表面——对每个项目、每次评审一视同仁，只能扫描代码本身的缺陷，感知不到项目特有的审查需求。具体表现为三个深层挑战：</p>
+<p><strong>领域知识匮乏。</strong> 跨领域技术栈差异大，且知识体系需要动态更新。通用模型见过很多代码，但未必懂内核的锁语义，也未必懂编译器的中间表示约定——而这些恰恰是评审结论对错的关键。</p>
+<p><strong>业务理解不足。</strong> 项目开发模式多样，审查的定位与功能需要贴合业务场景。对社区开源项目、企业内部仓库、发行版维护来说，"什么算问题、问题有多严重"的标准截然不同。</p>
+<p><strong>信任边界模糊。</strong> 缺乏客观的质量评估标准，以及难以对齐用户需求的进化机制。用户说"好"不一定是真的好，Agent 自我感觉良好更是靠不住——没有客观的评估与进化闭环，信任就无从建立。</p>
+<p>一句话概括：当 AI 深度介入核心业务时，AI 能"看懂"代码，却未必"看懂"项目。</p>
+<h2 id="kitta-code-review-agent_1">Kitta Code Review Agent 技术实践<a class="headerlink" href="#kitta-code-review-agent_1" title="Permanent link">&para;</a></h2>
+<p>针对这三个挑战，Kitta 的实践方案是把通用 Agent 领域化，通过"三步走"构建真正懂行的专家级 Code Review Agent。</p>
+<h3 id="31">3.1 第一步：项目级专家资产管理<a class="headerlink" href="#31" title="Permanent link">&para;</a></h3>
+<p>领域知识不是凭空来的，而是从真实历史中提炼的。Kitta 从社区研发历史中的真实评审与缺陷记录出发，覆盖项目 GitHub 仓库等多源数据。原始记录经过采集关联、规整去噪、语义解析、隔离复现，沉淀为项目级专家资产；其中"隔离复现"是为了让每一条缺陷模式与预期结论都可验证、经得起追问，而不是把噪音当经验。这份资产包含两类核心内容：</p>
+<ul>
+<li>
+<p><strong>评判标准</strong>——评审原则、缺陷模式、项目惯例，回答"按什么标准判"；</p>
+</li>
+<li>
+<p><strong>验证样本</strong>——问题样本、正常样本、预期结论，回答"判得对不对如何度量"。</p>
+</li>
+</ul>
+<p>这些资产可验证、可沉淀、可复用：换一个新项目，同样的管线可以把它的真实历史重新提炼成新的专家资产。这一步的本质，是让"懂行"从一种个人经验变成一种组织能力。</p>
+<h3 id="32">3.2 第二步：双轮驱动的代码审查定制<a class="headerlink" href="#32" title="Permanent link">&para;</a></h3>
+<p>有了专家资产，接下来要解决"怎么看"的问题。Kitta 的做法是双轮驱动——流程定义看哪里，知识决定怎么看。下面以龙蜥社区 ANCK 的落地为例，看这两个轮子分别做了什么。</p>
+<p><strong>审查流程定制，让 AI 看得全</strong>：定义审查要看哪里，包括语义一致性、回合完整性、发行版规范、集成风险等维度——语义一致性防止补丁行为与预期背离；回合完整性盯住跨版本补丁序列是否完整、有无遗漏；发行版规范把关是否符合发行版的合入要求；集成风险评估变更进入代码库后的连带影响。四个维度确保该看的都看到，不漏项。</p>
+<p>在 ANCK，流程定制的重点是<strong>回合补丁 Code Review</strong>。补丁回合是下游内核社区维护的高频操作：把上游补丁回合到下游时，往往要根据下游上下文做适配，既要准确判断适配是否正确，也要确认回合是否完整、有没有把上游后续的修复一并带回来。围绕这个场景，Kitta 定制了两项内核特定审查视角：</p>
+<ul>
+<li>
+<p><strong>补丁语义一致性检查</strong>——识别回合补丁与上游原补丁的差异，并结合语义判断补丁功能的一致性。方案上先微观溯源、比对补丁级差异，再宏观评估整体功能是否一致，避免"逐行都对、整体变了"的漏判。</p>
+</li>
+<li>
+<p><strong>补丁完整性检查</strong>——智能追踪回合补丁的上游依赖链，自动识别上游对应的 Fixes 补丁，采用四阶段遗漏 Fixes 检索流程，杜绝已知漏洞的回归。</p>
+</li>
+</ul>
+<p>此外，针对下游产品化流程中"代码本身的质量审查只是其中一个环节"的现状，Kitta 还覆盖了 PR 描述规范检查、描述与代码的一致性检查等流程类审查项，把审查范围从代码本身扩展到研发流程的完整上下文。</p>
+<p><strong>领域知识定制，让 AI 看得深</strong>：决定问题怎么判，依托多源头层次化知识库，做子领域拆分，沉淀典型缺陷模式，让 Agent 的判断贴合该领域专家的真实经验，而不是泛泛的"最佳实践"。在 ANCK，这轮定制落地为三件事：</p>
+<ul>
+<li>
+<p><strong>内核领域数据工程</strong>——收集多来源的内核领域知识，经过数据筛选、数据合成、数据均衡等处理流水线，得到领域知识库和 Benchmark 数据；</p>
+</li>
+<li>
+<p><strong>子系统专用知识库</strong>——内核不同子系统的评审关注点差异很大，按子系统组织专用知识库，让评审贴合各子领域的真实惯例；</p>
+</li>
+<li>
+<p><strong>深度审查流程</strong>——引入"有罪推定—全栈调用链分析—自我辩论"的审查流程：先假设代码有问题，沿全栈调用链追语义，再自我辩论验证结论，加强对内核常见关键代码风险的识别深度。</p>
+</li>
+</ul>
+<p>为了让定制效果可衡量，Kitta 还构建了<strong>Benchmark 评估体系</strong>：基于三类来源收集数据——LKML（真实社区 Reviewer 的评审过程，问题分布均匀、真实性强）、sashiko benchmark（单 commit—单 issue 精确对应）、龙蜥 Gitee 社区数据；并引入 sashiko、review-prompts、qoder 等多个 SOTA 代码审查工作参与横向评估，用对比结果指导 Skills 进化。</p>
+<h3 id="33">3.3 第三步：在线离线协同迭代进化<a class="headerlink" href="#33" title="Permanent link">&para;</a></h3>
+<p>领域知识是活的，Agent 也要持续进化。Kitta 采用在线离线协同的迭代机制：</p>
+<p><strong>离线侧，验证样本循环优化</strong>——用验证样本做隔离评测，根据结果反思进化，持续校准 Agent 的判断标准。</p>
+<p><strong>线上侧，线上观测持续校准</strong>——基于 Review 意见内容和研发的后续代码行为，开发了对各类意见有效性进行智能分析汇总的评估框架，结合 Review 采纳率持续监控、知识更新、迭代校准与阈值调整，让 Agent 在真实使用中越用越准。</p>
+<p><img alt="image.png" src="../../assets/imgs/chapter-25/image-002.png" /></p>
+<h2 id="kitta">Kitta 落地效果<a class="headerlink" href="#kitta" title="Permanent link">&para;</a></h2>
+<h3 id="41">4.1 龙蜥社区内核仓库的实践<a class="headerlink" href="#41" title="Permanent link">&para;</a></h3>
+<p>Kitta  已在龙蜥社区的真实研发流水线中持续落地运行，沿着一条完整的五阶段流水线对每一个内核 PR 进行审查。开发者提交 PR 或在评论中输入 <code>/check-code-review</code> 后，审查任务即被触发；整个流程先分类、再检查规范与依赖、最后落到代码质量，层层递进。</p>
+<p><strong>Stage 1. PR 分类。</strong> Kitta 首先判断这是纯自研补丁还是回合补丁：如果 Commit 中存在类似 <code>commit xxxx upstream</code> 的上游补丁声明，则归为回合补丁。分类决定后续检查范围——纯自研补丁不会执行补丁完整性检查和回合一致性检查，避免不必要的开销。</p>
+<p><strong>Stage 2. PR/Commit Message 规范性检查。</strong> 基于龙蜥社区规范文档，对 PR 描述、Commit Title、Commit Message 等进行检查。这一步看起来"轻"，却能提前拦住大量因描述不清、标题不规范导致的维护成本。没有问题则不报告；有问题则给出 Message 规范建议，供开发者参考。</p>
+<p><img alt="image.png" src="../../assets/imgs/chapter-25/image-003.png" /></p>
+<p><strong>Stage 3. 补丁完整性检查。</strong> 针对回合补丁，Kitta 会智能追踪其上游依赖链，自动识别上游对应的 Fixes 补丁，按"检索上游 Fixes → 判断是否在 PR 中 → 判断是否在下游仓库已存在"的流程排查遗漏。检查结果分为三类：<code>无遗漏 Fixes</code> 表示无需补充；<code>已合入的 Fixes 补丁</code> 说明相关修复已存在于下游仓库；<code>遗漏的 Fixes 补丁</code> 则要求开发者补充，防止已知漏洞被重新引入下游。</p>
+<p><img alt="image.png" src="../../assets/imgs/chapter-25/image-004.png" /></p>
+<p><strong>Stage 4. 补丁回合一致性检查。</strong> 对于声明了上游来源的回合补丁，Kitta 会先获取上游原补丁，再从三个层次对比：基础对比看修改的文件和代码块是否一致；上下文对比看引用的符号、函数、变量定义是否一致、是否做了合理适配；语义对比则通过 LLM 判断上下游补丁是否实现了相同功能和语义。检查结果从 <code>consistent</code> 到 <code>text-inconsistent</code>、<code>semantic-inconsistent</code>、<code>inconsistent</code>分层输出，让开发者和 Maintainer 快速定位差异性质。</p>
+<p><img alt="image.png" src="../../assets/imgs/chapter-25/image-005.png" /></p>
+<p><strong>Stage 5. 代码质量审查。</strong> 最后落到代码本身，Kitta 将审查出的问题按严重程度分为 <code>Critical</code>、<code>Medium / Low</code>，Critical 问题通常会以内联评论定位到具体代码行，需要开发者处理或明确是否为误报；未发现风险则给出 <code>LGTM</code>。</p>
+<p><img alt="image.png" src="../../assets/imgs/chapter-25/image-006.png" /></p>
+<p>Kitta 上线至今，核心运行数据如下：</p>
+<table>
+<thead>
+<tr>
+<th>指标</th>
+<th>数值</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>审查规模</td>
+<td>7 万+</td>
+</tr>
+<tr>
+<td>门禁准确率</td>
+<td>97%</td>
+</tr>
+<tr>
+<td>代码合入率</td>
+<td>62%</td>
+</tr>
+</tbody>
+</table>
+<p>ANCK 的代码变更以回合补丁和自研补丁为主，既要保证与上游语义一致，又要适配下游产品化需求，审查深度和准确率要求都很高。基于线上评估框架对 Kitta 上线以来处理过的所有已合入 PR 进行回溯统计，两类核心场景都取得了可量化的效果：</p>
+<ul>
+<li>
+<p><strong>回合补丁场景</strong>：一致性检查意见采纳率 70.4%、准确率 99.8%；</p>
+</li>
+<li>
+<p><strong>自研 PR 场景</strong>：Code Review 意见采纳率 41.8%、准确率 73.6%；</p>
+</li>
+</ul>
+<p>Kitta 的介入让大量代码问题在进入人工审查之前就被识别，并给出可定位、可验证的修改建议。实践中，很多 PR 在 Kitta 给出意见后，开发者会直接依据建议补充依赖补丁或调整实现，大幅减少了 Maintainer 反复追问、来回确认的回合数。对社区 Maintainer 来说，这意味着他们可以把注意力从"逐行看变更"转移到"判断关键争议点"；对开发者来说，则意味着更快的反馈和更可预期的合入节奏。</p>
+<h3 id="42-benchmark">4.2 Benchmark 评估体系：让定制效果可衡量<a class="headerlink" href="#42-benchmark" title="Permanent link">&para;</a></h3>
+<p>为了让定制效果可衡量，Kitta 还构建了 Benchmark 评估体系：基于三类来源收集数据——LKML（真实社区 Reviewer 的评审过程，问题分布均匀、真实性强）、sashiko benchmark（单 commit—单 issue 精确对应）、龙蜥社区数据。其中：</p>
+<ul>
+<li>
+<p>LKML 数据让 Kitta 能够对齐真实社区 Reviewer 的判断标准</p>
+</li>
+<li>
+<p>sashiko benchmark 提供了严格的单 commit—单 issue 映射，让能力改进方向足够聚焦</p>
+</li>
+<li>
+<p>龙蜥社区数据则把评估拉回到 Kitta 实际服务的仓库语境中</p>
+</li>
+</ul>
+<p>通过与 sashiko、review-prompts、qoder 等 SOTA 方案横向对比，Kitta 能够清楚看到自身在特定缺陷类型、特定子系统上的差距，并把这些差距转化为 Skill 迭代的优先级。后续该 Benchmark 系统还将支持接入其他 Skills/Benchmark 进行评估，持续迭代优化能力。</p>
+<h3 id="43">4.3 跨领域通用实践<a class="headerlink" href="#43" title="Permanent link">&para;</a></h3>
+<p>Kitta 的能力并不局限于内核。通过把专家资产和审查流程抽象为可迁移的 Skill，Kitta 已经在操作系统内核、编译器、文件系统、网络系统、云原生平台、AI 计算框架六个领域完成验证。这些领域共同的特点是代码规模大、语义深、审查门槛高，传统通用 Review 工具往往难以给出有价值的结论。Kitta 在这些场景下的表现如下：</p>
+<table>
+<thead>
+<tr>
+<th>领域</th>
+<th>审查质量提升</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>操作系统内核</td>
+<td>20.4%</td>
+</tr>
+<tr>
+<td>编译器</td>
+<td>24.4%</td>
+</tr>
+<tr>
+<td>文件系统</td>
+<td>17.0%</td>
+</tr>
+<tr>
+<td>网络系统</td>
+<td>19.8%</td>
+</tr>
+<tr>
+<td>云原生平台</td>
+<td>31.6%</td>
+</tr>
+<tr>
+<td>AI 计算框架</td>
+<td>21.7%</td>
+</tr>
+</tbody>
+</table>
+<p>跨领域的稳定提升说明 Kitta 的"领域定制"方法论具有通用性：无论是内核的锁语义、编译器的中间表示，还是云原生平台的配置约定，都可以通过沉淀专家资产、定制审查流程来构建专家级 Review 能力。这也为后续向 LLVM、CRIU、BaseOS 等更多基础软件项目扩展奠定了基础。</p>
+<h3 id="43_1">4.3 数据飞轮：数据向下沉淀，模型能力向上反哺<a class="headerlink" href="#43_1" title="Permanent link">&para;</a></h3>
+<p>Kitta 在服务过程中还在持续沉淀数据，可以用于千问基座模型的形成"数据向下沉淀、能力向上反哺"的飞轮：</p>
+<table>
+<thead>
+<tr>
+<th>沉淀的数据</th>
+<th>反哺的能力</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>专家标注的 Benchmark 基准数据集</td>
+<td>漏洞发现能力——更深入的语义理解与潜在漏洞发现</td>
+</tr>
+<tr>
+<td>Agent 思维链轨迹跟踪数据</td>
+<td>指令跟随能力——更准确的工具调用与指令遵循</td>
+</tr>
+<tr>
+<td>用户偏好对齐数据</td>
+<td>用户对话能力——贴近用户需求的评审意见表达</td>
+</tr>
+<tr>
+<td>用户后续 Coding 动作</td>
+<td>代码生成能力——更好的跨语言 Coding 与 Debug 能力</td>
+</tr>
+</tbody>
+</table>
+<p>评审过程中产生的专家标注、思维链轨迹、用户偏好与后续代码改动，既是改进 Review 服务本身的燃料，也在反哺基座模型更基础的能力。反哺基座模型更基础的能力。更重要的是，这些数据来自真实的社区运行，而不是人工构造的静态数据集，因此每一次迭代都在让 Kitta 更贴近实际研发场景。</p>
+<h2 id="ai-code-review_1">实践总结：AI Code Review 的边界与共识<a class="headerlink" href="#ai-code-review_1" title="Permanent link">&para;</a></h2>
+<p>经过落地实践后，我们发现要想最大化 AI Code Review 的效果，首先需要明确的是 AI 与人在协作中的信任边界。Kitta 遵循三条原则：</p>
+<p><strong>精准分级，克制打扰——严守门禁底线，释放建议空间。</strong> 对安全漏洞和破坏坚决拦截 CI 流程，这是底线；其余问题分级呈现、仅作提示，不过多占用开发者的注意力，平衡问题披露阈值。</p>
+<p><strong>行为作证，拒绝自嗨——用户可能沉默，但代码变更骗不了人。</strong> 不把开发者的默默无视当成认可，不看用户说什么，看"代码改了什么"：通过置信度熔断与追踪真实代码变更，基于客观变更驱动审查和模型迭代。</p>
+<p><strong>人类兜底，适时退场。</strong> AI 是探照灯，照亮风险、给出证据；Maintainer 是方向盘，最终决策权在人，是最后一道防线。</p>
+<p>最好的 AI 门禁，不是替代 Maintainer，而是让他们只把精力花在真正需要人类智慧的地方。</p>
+<hr />
+<p><em>本文档为技术能力介绍材料，文中数据来源于内部评测与生产环境统计。</em></p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  回到页面顶部
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.tabs", "navigation.top", "search.suggest", "search.highlight", "content.code.copy"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "\u5df2\u590d\u5236", "clipboard.copy": "\u590d\u5236", "search.result.more.one": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.more.other": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 # \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.none": "\u6ca1\u6709\u627e\u5230\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.one": "\u627e\u5230 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.other": "# \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.placeholder": "\u952e\u5165\u4ee5\u5f00\u59cb\u641c\u7d22", "search.result.term.missing": "\u7f3a\u5c11", "select.version": "\u9009\u62e9\u5f53\u524d\u7248\u672c"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.d7400e89.min.js"></script>
+      
+    
+  </body>
+</html>
