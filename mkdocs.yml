@@ -1,5 +1,5 @@
-site_name: AI Agent 手白皮书
-site_description: 阿里云 AI Agent 手白皮书 — 架构 · 构建 · 运行 · 治理 · 调优 · 实践
+site_name: AI Agent Handbook
+site_description: 阿里云 AI Agent Handbook — 架构 · 构建 · 运行 · 治理 · 调优 · 实践
 docs_dir: docs
 use_directory_urls: false
 
