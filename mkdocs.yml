@@ -1,4 +1,4 @@
-site_name: AI Agent Handbook
+site_name: 阿里云 AI Agent Handbook
 site_description: 阿里云 AI Agent Handbook — 架构 · 构建 · 运行 · 治理 · 调优 · 实践
 docs_dir: docs
 use_directory_urls: false
